@@ -1,92 +1,49 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { collection, onSnapshot, addDoc, query, orderBy } from "firebase/firestore";
+import { collection, onSnapshot, addDoc, query, orderBy, deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { motion, AnimatePresence } from "framer-motion";
 import { format, subDays } from "date-fns";
-import {
-  TrendingUp, TrendingDown, Wallet, PiggyBank,
-  Download, Plus, X, Calendar, Filter
-} from "lucide-react";
+import { Wallet, Plus, ArrowUpRight, ArrowDownRight, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
-  DialogFooter, DialogClose
-} from "@/components/ui/dialog";
-import {
-  ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
-  Tooltip, PieChart, Pie, Cell
-} from "recharts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 
-// Types
 interface Transaction {
   id: string;
   date: string;
   description: string;
-  amount: number; // positive = income, negative = expense
+  amount: number;
   category: string;
   type: "income" | "expense";
-  timestamp: Date;
 }
-
-interface SavingsTarget {
-  id: string;
-  title: string;
-  targetAmount: number;
-  currentAmount: number;
-  deadline: string;
-  icon?: string;
-}
-
-const COLORS = ["#00C9A7", "#9B5DE5", "#F15BB5", "#FEE440", "#00BBF9"];
 
 export default function FinanceTracker({ userId }: { userId: string }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [savingsTargets, setSavingsTargets] = useState<SavingsTarget[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [reportRange, setReportRange] = useState({
-    startDate: format(subDays(new Date(), 30), "yyyy-MM-dd"),
-    endDate: format(new Date(), "yyyy-MM-dd"),
-  });
+  const [newTx, setNewTx] = useState({ description: "", amount: "", type: "expense" as "income" | "expense", category: "", date: format(new Date(), "yyyy-MM-dd") });
 
-  const [newTx, setNewTx] = useState({
-    description: "",
-    amount: "",
-    type: "expense" as "income" | "expense",
-    category: "",
-    date: format(new Date(), "yyyy-MM-dd"),
-  });
-
-  // Fetch data
   useEffect(() => {
     const q = query(collection(db, "users", userId, "transactions"), orderBy("date", "desc"));
-    const unsub1 = onSnapshot(q, (snapshot) => {
+    const unsub = onSnapshot(q, (snapshot) => {
       setTransactions(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Transaction)));
     });
-    const unsub2 = onSnapshot(collection(db, "users", userId, "savings_targets"), (snapshot) => {
-      setSavingsTargets(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as SavingsTarget)));
-    });
-    return () => { unsub1(); unsub2(); };
+    return () => unsub();
   }, [userId]);
 
-  // Calculations
   const totalIncome = transactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
   const totalExpense = transactions.filter(t => t.type === "expense").reduce((s, t) => s + Math.abs(t.amount), 0);
-  const balance = totalIncome - totalExpense;
-  const savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
+  const netWorth = totalIncome - totalExpense;
 
-  // Chart data: last 30 days
   const chartData = [...Array(30)].map((_, i) => {
     const date = format(subDays(new Date(), 29 - i), "MMM dd");
     const dayTxs = transactions.filter(t => format(new Date(t.date), "MMM dd") === date);
     const income = dayTxs.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
     const expense = dayTxs.filter(t => t.type === "expense").reduce((s, t) => s + Math.abs(t.amount), 0);
-    return { date, income, expense };
+    return { date, net: income - expense };
   });
 
   const addTransaction = async () => {
@@ -97,220 +54,151 @@ export default function FinanceTracker({ userId }: { userId: string }) {
       type: newTx.type,
       category: newTx.category,
       date: newTx.date,
-      timestamp: new Date(),
     });
     setNewTx({ description: "", amount: "", type: "expense", category: "", date: format(new Date(), "yyyy-MM-dd") });
     setIsAddModalOpen(false);
   };
 
-  const generateReport = () => {
-    const filtered = transactions.filter(t => {
-      const d = new Date(t.date);
-      return d >= new Date(reportRange.startDate) && d <= new Date(reportRange.endDate);
-    });
-    const inc = filtered.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
-    const exp = filtered.filter(t => t.type === "expense").reduce((s, t) => s + Math.abs(t.amount), 0);
-    alert(`📊 Report (${reportRange.startDate} → ${reportRange.endDate})\n\nIncome: Rp ${inc.toLocaleString()}\nExpense: Rp ${exp.toLocaleString()}\nNet: Rp ${(inc - exp).toLocaleString()}\nTransactions: ${filtered.length}`);
-    setIsReportModalOpen(false);
+  const deleteTransaction = async (id: string) => {
+    await deleteDoc(doc(db, "users", userId, "transactions", id));
   };
 
   return (
     <div className="space-y-6">
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <GlassCard icon={<Wallet className="h-5 w-5 text-emerald-400" />} label="Balance" value={`Rp ${balance.toLocaleString()}`} trend={balance >= 0 ? "positive" : "negative"} />
-        <GlassCard icon={<TrendingUp className="h-5 w-5 text-cyan-400" />} label="Income" value={`Rp ${totalIncome.toLocaleString()}`} />
-        <GlassCard icon={<TrendingDown className="h-5 w-5 text-rose-400" />} label="Expenses" value={`Rp ${totalExpense.toLocaleString()}`} />
-        <GlassCard icon={<PiggyBank className="h-5 w-5 text-purple-400" />} label="Savings Rate" value={`${savingsRate.toFixed(1)}%`} />
-      </div>
-
-      {/* Chart + Savings Rings */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="glass-card lg:col-span-2">
+      {/* Net Worth Hero */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="glass-panel md:col-span-2 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -z-10" />
           <CardHeader>
-            <CardTitle className="text-white text-sm font-medium">30-Day Cashflow</CardTitle>
+            <CardTitle className="text-zinc-400 text-sm font-medium flex items-center gap-2">
+              <Wallet className="h-4 w-4" /> Estimated Net Worth
+            </CardTitle>
           </CardHeader>
-          <CardContent className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#00C9A7" stopOpacity={0.8} />
-                    <stop offset="100%" stopColor="#00C9A7" stopOpacity={0.05} />
-                  </linearGradient>
-                  <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#F15BB5" stopOpacity={0.8} />
-                    <stop offset="100%" stopColor="#F15BB5" stopOpacity={0.05} />
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="date" stroke="#a1a1aa" fontSize={10} tickLine={false} />
-                <YAxis stroke="#a1a1aa" fontSize={10} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", backdropFilter: "blur(10px)" }} />
-                <Area type="monotone" dataKey="income" stroke="#00C9A7" fill="url(#incomeGrad)" strokeWidth={2} />
-                <Area type="monotone" dataKey="expense" stroke="#F15BB5" fill="url(#expenseGrad)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
+          <CardContent>
+            <div className="text-4xl font-bold gradient-text mb-6">
+              Rp {netWorth.toLocaleString()}
+            </div>
+            <div className="h-48 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="netGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="date" stroke="#52525b" fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#52525b" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `${val/1000}k`} />
+                  <Tooltip 
+                    contentStyle={{ background: "rgba(24, 24, 27, 0.8)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", backdropFilter: "blur(12px)", color: "#fff" }}
+                    itemStyle={{ color: "#10b981" }}
+                  />
+                  <Area type="monotone" dataKey="net" stroke="#10b981" strokeWidth={3} fill="url(#netGrad)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle className="text-white text-sm font-medium">Savings Goals</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {savingsTargets.length === 0 ? (
-              <p className="text-white/40 text-sm text-center py-4">No savings goals set</p>
-            ) : (
-              savingsTargets.map((target, idx) => {
-                const progress = Math.min(100, (target.currentAmount / target.targetAmount) * 100);
-                return (
-                  <div key={target.id} className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-white/70">{target.title}</span>
-                      <span className="text-white/50">{progress.toFixed(0)}%</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full rounded-full"
-                        style={{ background: COLORS[idx % COLORS.length] }}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                      />
-                    </div>
-                    <div className="flex justify-between text-[10px] text-white/40">
-                      <span>Rp {target.currentAmount.toLocaleString()}</span>
-                      <span>Rp {target.targetAmount.toLocaleString()}</span>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-            <Button variant="ghost" size="sm" className="w-full text-white/50 hover:text-white/80 text-xs border border-white/10">
-              + Add Goal
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <Card className="glass-panel">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-zinc-400 text-xs uppercase tracking-wider">Total Income</p>
+                <p className="text-emerald-400 text-2xl font-bold mt-1 flex items-center gap-2">
+                  <ArrowUpRight className="h-5 w-5" /> Rp {totalIncome.toLocaleString()}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="glass-panel">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-zinc-400 text-xs uppercase tracking-wider">Total Expenses</p>
+                <p className="text-rose-400 text-2xl font-bold mt-1 flex items-center gap-2">
+                  <ArrowDownRight className="h-5 w-5" /> Rp {totalExpense.toLocaleString()}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Recent Transactions */}
-      <Card className="glass-card">
+      <Card className="glass-panel">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-white text-sm font-medium">Recent Transactions</CardTitle>
-          <Button variant="ghost" size="sm" onClick={() => setIsReportModalOpen(true)} className="text-white/50 hover:text-white/80">
-            <Download className="h-4 w-4 mr-1" /> Report
+          <CardTitle className="text-zinc-100 text-sm font-medium">Recent Transactions</CardTitle>
+          <Button variant="ghost" size="sm" onClick={() => setIsAddModalOpen(true)} className="glass-button text-zinc-300 hover:text-white">
+            <Plus className="h-4 w-4 mr-1" /> Add Transaction
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
-            {transactions.slice(0, 10).map((t) => (
-              <motion.div
-                key={t.id}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5 hover:border-white/15 transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${t.type === "income" ? "bg-emerald-500/20 text-emerald-400" : "bg-rose-500/20 text-rose-400"}`}>
-                    {t.type === "income" ? "+" : "–"}
+          <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
+            <AnimatePresence>
+              {transactions.slice(0, 15).map((t) => (
+                <motion.div
+                  key={t.id}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/15 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${t.type === "income" ? "bg-emerald-500/20 text-emerald-400" : "bg-rose-500/20 text-rose-400"}`}>
+                      {t.type === "income" ? "+" : "–"}
+                    </div>
+                    <div>
+                      <p className="text-zinc-100 text-sm font-medium">{t.description}</p>
+                      <p className="text-zinc-500 text-xs">{t.category} • {format(new Date(t.date), "dd MMM yyyy")}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-white text-sm font-medium">{t.description}</p>
-                    <p className="text-white/30 text-xs">{t.category} • {format(new Date(t.date), "dd MMM yyyy")}</p>
+                  <div className="flex items-center gap-4">
+                    <p className={`text-sm font-semibold ${t.type === "income" ? "text-emerald-400" : "text-rose-400"}`}>
+                      {t.type === "income" ? "+" : "–"}Rp {Math.abs(t.amount).toLocaleString()}
+                    </p>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-red-400 hover:bg-red-500/10" onClick={() => deleteTransaction(t.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                </div>
-                <p className={`text-sm font-semibold ${t.type === "income" ? "text-emerald-400" : "text-rose-400"}`}>
-                  {t.type === "income" ? "+" : "–"}Rp {Math.abs(t.amount).toLocaleString()}
-                </p>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </AnimatePresence>
             {transactions.length === 0 && (
-              <p className="text-white/30 text-sm text-center py-8">No transactions yet. Tap + to add one.</p>
+              <div className="text-center py-12 text-zinc-500">No transactions yet. Tap + to add one.</div>
             )}
           </div>
         </CardContent>
       </Card>
 
-      {/* FAB */}
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsAddModalOpen(true)}
-        className="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 shadow-lg shadow-purple-500/30 flex items-center justify-center z-20 border border-white/20"
-      >
-        <Plus className="h-6 w-6 text-white" />
-      </motion.button>
-
       {/* Add Transaction Modal */}
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-        <DialogContent className="glass-card border-white/20 text-white max-w-sm">
+        <DialogContent className="glass-panel border-white/20 text-zinc-100 max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-white">Add Transaction</DialogTitle>
+            <DialogTitle className="text-zinc-100">Add Transaction</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <Select value={newTx.type} onValueChange={(v: any) => setNewTx({ ...newTx, type: v })}>
-              <SelectTrigger className="bg-white/10 border-white/20 text-white">
+              <SelectTrigger className="glass-panel bg-transparent text-zinc-100">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="glass-panel border-white/20 bg-zinc-950/90">
                 <SelectItem value="income">Income</SelectItem>
                 <SelectItem value="expense">Expense</SelectItem>
               </SelectContent>
             </Select>
-            <Input placeholder="Description" value={newTx.description} onChange={(e) => setNewTx({ ...newTx, description: e.target.value })} className="bg-white/10 border-white/20 text-white placeholder:text-white/30" />
-            <Input type="number" placeholder="Amount" value={newTx.amount} onChange={(e) => setNewTx({ ...newTx, amount: e.target.value })} className="bg-white/10 border-white/20 text-white placeholder:text-white/30" />
-            <Input type="date" value={newTx.date} onChange={(e) => setNewTx({ ...newTx, date: e.target.value })} className="bg-white/10 border-white/20 text-white" />
+            <Input placeholder="Description (e.g., Salary, Groceries)" value={newTx.description} onChange={(e) => setNewTx({ ...newTx, description: e.target.value })} className="glass-panel bg-transparent text-zinc-100 placeholder:text-zinc-500" />
+            <Input type="number" placeholder="Amount" value={newTx.amount} onChange={(e) => setNewTx({ ...newTx, amount: e.target.value })} className="glass-panel bg-transparent text-zinc-100 placeholder:text-zinc-500" />
+            <Input placeholder="Category (e.g., Food, Transport)" value={newTx.category} onChange={(e) => setNewTx({ ...newTx, category: e.target.value })} className="glass-panel bg-transparent text-zinc-100 placeholder:text-zinc-500" />
+            <Input type="date" value={newTx.date} onChange={(e) => setNewTx({ ...newTx, date: e.target.value })} className="glass-panel bg-transparent text-zinc-100" />
           </div>
           <DialogFooter className="gap-2">
-            <DialogClose>
-              <Button variant="outline" className="bg-white/5 border-white/20 text-white">Cancel</Button>
+            <DialogClose asChild>
+              <Button variant="outline" className="glass-button text-zinc-300">Cancel</Button>
             </DialogClose>
-            <Button onClick={addTransaction} className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white">Add</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Report Modal */}
-      <Dialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
-        <DialogContent className="glass-card border-white/20 text-white max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-white">Generate Report</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div>
-              <label className="text-white/50 text-xs">Start Date</label>
-              <Input type="date" value={reportRange.startDate} onChange={(e) => setReportRange({ ...reportRange, startDate: e.target.value })} className="bg-white/10 border-white/20 text-white" />
-            </div>
-            <div>
-              <label className="text-white/50 text-xs">End Date</label>
-              <Input type="date" value={reportRange.endDate} onChange={(e) => setReportRange({ ...reportRange, endDate: e.target.value })} className="bg-white/10 border-white/20 text-white" />
-            </div>
-          </div>
-          <DialogFooter className="gap-2">
-            <DialogClose>
-              <Button variant="outline" className="bg-white/5 border-white/20 text-white">Cancel</Button>
-            </DialogClose>
-            <Button onClick={generateReport} className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white">Generate</Button>
+            <Button onClick={addTransaction} className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-0 shadow-lg shadow-emerald-500/20">Add</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
-  );
-}
-
-// Helper GlassCard component
-function GlassCard({ icon, label, value, trend }: { icon: React.ReactNode; label: string; value: string; trend?: "positive" | "negative" }) {
-  return (
-    <Card className="glass-card">
-      <CardContent className="p-4 flex items-center justify-between">
-        <div>
-          <p className="text-white/40 text-xs uppercase tracking-wider">{label}</p>
-          <p className="text-white text-xl font-bold mt-1">{value}</p>
-        </div>
-        <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
-          {icon}
-        </div>
-      </CardContent>
-    </Card>
   );
 }
