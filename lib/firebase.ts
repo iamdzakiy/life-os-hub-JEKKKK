@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -11,7 +11,21 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// Validate Firebase config
+if (!getApps().length) {
+  initializeApp(firebaseConfig);
+}
+
+export const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const OWNER_EMAIL = process.env.NEXT_PUBLIC_OWNER_EMAIL || "email_kamu@gmail.com";
+
+// Google Auth Provider for sign-in
+export const googleProvider = new GoogleAuthProvider();
+
+// Owner email - must be set in environment
+export const OWNER_EMAIL = process.env.NEXT_PUBLIC_OWNER_EMAIL;
+
+if (!OWNER_EMAIL) {
+  console.warn("NEXT_PUBLIC_OWNER_EMAIL not set in environment variables");
+}
