@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     };
     const response = await calendar.events.insert({ calendarId: "primary", requestBody: event });
     return NextResponse.json({ success: true, event: response.data });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ success: false, error: "Failed to create event" }, { status: 500 });
   }
 }
@@ -64,7 +64,7 @@ export async function PUT(req: Request) {
       },
     });
     return NextResponse.json({ success: true, event: response.data });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ success: false, error: "Failed to update event" }, { status: 500 });
   }
 }
@@ -81,7 +81,7 @@ export async function DELETE(req: Request) {
     
     await calendar.events.delete({ calendarId: "primary", eventId });
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ success: false, error: "Failed to delete event" }, { status: 500 });
   }
 }

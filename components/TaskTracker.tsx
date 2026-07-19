@@ -1,6 +1,7 @@
 "use client";
+
 import { useState, useEffect } from "react";
-import { collection, addDoc, updateDoc, doc, onSnapshot, query } from "firebase/firestore";
+import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { format } from "date-fns";
 import { LayoutList, LayoutGrid } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Task {
   id: string;
@@ -21,26 +23,33 @@ interface Task {
 }
 
 const STATUS_COLUMNS = [
-  { id: "todo", label: "To Do", color: "border-zinc-600" },
-  { id: "in-progress", label: "In Progress", color: "border-blue-600" },
-  { id: "review", label: "Review", color: "border-yellow-600" },
-  { id: "done", label: "Done", color: "border-green-600" },
+  { id: "todo", label: "To Do", color: "from-zinc-600/20", icon: "📋" },
+  { id: "in-progress", label: "In Progress", color: "from-blue-600/20", icon: "⚡" },
+  { id: "review", label: "Review", color: "from-yellow-600/20", icon: "🔍" },
+  { id: "done", label: "Done", color: "from-green-600/20", icon: "✅" },
 ] as const;
 
-function ListView({ tasks, archiveTask, updateTaskPriority }: {
+function ListView({ tasks, archiveTask, updateTaskPriority, moveTask }: {
   tasks: Task[],
   archiveTask: (task: Task) => void,
-  updateTaskPriority: (task: Task, priority: Task["priority"]) => void
+  updateTaskPriority: (task: Task, priority: Task["priority"]) => void,
+  moveTask: (task: Task, status: Task["status"]) => void
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {tasks.filter(t => t.status !== "done").map((task) => (
-        <div key={task.id} className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg border border-zinc-700/50 hover:border-zinc-600 transition-colors">
+        <motion.div
+          key={task.id}
+          layout
+          initial={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -100, transition: { duration: 0.3 } }}
+          className="flex items-center justify-between p-3 bg-white/5 backdrop-blur-md rounded-lg border border-white/10 hover:border-white/20 transition-all"
+        >
           <div className="flex items-center gap-3">
             <Checkbox 
               checked={task.status === "done"} 
               onCheckedChange={() => archiveTask(task)}
-              className="border-zinc-500 data-[state=checked]:bg-blue-600"
+              className="border-white/30"
             />
             <div>
               <p className="font-medium text-zinc-100">{task.title}</p>
@@ -48,8 +57,19 @@ function ListView({ tasks, archiveTask, updateTaskPriority }: {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Select value={task.status} onValueChange={(v) => moveTask(task, v as Task["status"])}>
+              <SelectTrigger className="w-32 h-7 bg-white/5 border-white/10">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todo">To Do</SelectItem>
+                <SelectItem value="in-progress">In Progress</SelectItem>
+                <SelectItem value="review">Review</SelectItem>
+                <SelectItem value="done">Done</SelectItem>
+              </SelectContent>
+            </Select>
             <Select value={task.priority} onValueChange={(v) => updateTaskPriority(task, v as Task["priority"])}>
-              <SelectTrigger className="w-24 h-7 bg-zinc-800 border-zinc-700">
+              <SelectTrigger className="w-24 h-7 bg-white/5 border-white/10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -58,11 +78,14 @@ function ListView({ tasks, archiveTask, updateTaskPriority }: {
                 <SelectItem value="high">High</SelectItem>
               </SelectContent>
             </Select>
-            <Badge variant={task.priority === "high" ? "destructive" : "secondary"} className="capitalize">
+            <Badge 
+              variant={task.priority === "high" ? "destructive" : "secondary"} 
+              className="capitalize bg-white/10 border-white/10"
+            >
               {task.priority}
             </Badge>
           </div>
-        </div>
+        </motion.div>
       ))}
       {tasks.filter(t => t.status !== "done").length === 0 && (
         <p className="text-zinc-500 text-sm text-center py-4">No active tasks. Add one above!</p>
@@ -71,23 +94,43 @@ function ListView({ tasks, archiveTask, updateTaskPriority }: {
   );
 }
 
-function KanbanView({ tasks }: { tasks: Task[] }) {
+function KanbanView({ tasks, moveTask }: { 
+  tasks: Task[], 
+  moveTask: (task: Task, status: Task["status"]) => void 
+}) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {STATUS_COLUMNS.map((col) => (
-        <div key={col.id} className={`space-y-3 p-3 rounded-lg border-t-4 ${col.color} bg-zinc-800/30`}>
-          <h3 className="font-semibold text-zinc-200 text-sm uppercase tracking-wider">{col.label}</h3>
+        <motion.div 
+          key={col.id} 
+          className={`space-y-3 p-4 rounded-xl bg-gradient-to-b ${col.color} to-transparent border border-white/5`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <h3 className="font-semibold text-zinc-200 text-sm uppercase tracking-wider flex items-center gap-2">
+            <span>{col.icon}</span> {col.label}
+          </h3>
           <div className="space-y-2 min-h-32">
-            {tasks.filter(t => t.status === col.id).map((task) => (
-              <div key={task.id} className="p-3 bg-zinc-800 rounded-lg border border-zinc-700 cursor-move">
-                <p className="text-sm font-medium text-zinc-100 mb-2">{task.title}</p>
-                <Badge variant={task.priority === "high" ? "destructive" : "secondary"} className="text-xs capitalize">
-                  {task.priority}
-                </Badge>
-              </div>
-            ))}
+            <AnimatePresence>
+              {tasks.filter(t => t.status === col.id).map((task) => (
+                <motion.div 
+                  key={task.id} 
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="p-3 bg-white/5 backdrop-blur-md rounded-lg border border-white/10 cursor-move hover:border-white/20"
+                >
+                  <p className="text-sm font-medium text-zinc-100 mb-2">{task.title}</p>
+                  <Badge variant={task.priority === "high" ? "destructive" : "secondary"} className="text-xs capitalize bg-white/10 border-white/10">
+                    {task.priority}
+                  </Badge>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
       ))}
     </div>
   );
@@ -125,31 +168,49 @@ export default function TaskTracker({ userId }: { userId: string }) {
     await updateDoc(taskRef, { priority });
   };
 
-  const archiveTask = async (task: Task) => {
+  const moveTask = async (task: Task, status: Task["status"]) => {
     const taskRef = doc(db, "users", userId, "tasks", task.id);
-    await updateDoc(taskRef, { status: "done", completedAt: new Date() });
+    if (status === "done") {
+      // Archive to tasks_archive collection
+      const taskData = { ...task, status, completedAt: new Date().toISOString() };
+      await addDoc(collection(db, "users", userId, "tasks_archive"), taskData);
+      // Delete from active tasks
+      await deleteDoc(taskRef);
+    } else {
+      await updateDoc(taskRef, { status });
+    }
+  };
+
+  const archiveTask = async (task: Task) => {
+    await moveTask(task, "done");
   };
 
   return (
-    <div className="space-y-4">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-4"
+    >
       <div className="flex items-center justify-between">
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-1">
           <Input
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
             placeholder="Add new task..."
-            className="bg-zinc-800 border-zinc-700 text-zinc-100"
+            className="bg-white/5 backdrop-blur-md border border-white/10 text-zinc-100 placeholder:text-zinc-400 focus:border-cyan-500/50"
             onKeyDown={(e) => e.key === "Enter" && addTask()}
           />
-          <Button onClick={addTask} className="bg-blue-600 hover:bg-blue-700">Add</Button>
+          <Button onClick={addTask} className="bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white hover:opacity-90">
+            Add
+          </Button>
         </div>
         
-        <div className="flex gap-1">
+        <div className="flex gap-1 ml-4">
           <Button
             variant={view === "list" ? "default" : "outline"}
             size="sm"
             onClick={() => setView("list")}
-            className={view === "list" ? "bg-zinc-800" : "bg-transparent"}
+            className={view === "list" ? "bg-white/10" : "bg-transparent border-white/10"}
           >
             <LayoutList className="h-4 w-4" />
           </Button>
@@ -157,18 +218,34 @@ export default function TaskTracker({ userId }: { userId: string }) {
             variant={view === "kanban" ? "default" : "outline"}
             size="sm"
             onClick={() => setView("kanban")}
-            className={view === "kanban" ? "bg-zinc-800" : "bg-transparent"}
+            className={view === "kanban" ? "bg-white/10" : "bg-transparent border-white/10"}
           >
             <LayoutGrid className="h-4 w-4" />
           </Button>
         </div>
       </div>
       
-      {view === "list" ? (
-        <ListView tasks={tasks} archiveTask={archiveTask} updateTaskPriority={updateTaskPriority} />
-      ) : (
-        <KanbanView tasks={tasks} />
-      )}
-    </div>
+      <AnimatePresence mode="wait">
+        {view === "list" ? (
+          <motion.div
+            key="list"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+          >
+            <ListView tasks={tasks} archiveTask={archiveTask} updateTaskPriority={updateTaskPriority} moveTask={moveTask} />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="kanban"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+          >
+            <KanbanView tasks={tasks} moveTask={moveTask} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

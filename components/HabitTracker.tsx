@@ -1,10 +1,12 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { collection, addDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
 
 interface Habit {
   id: string;
@@ -12,6 +14,48 @@ interface Habit {
   frequency: "daily" | "weekly";
   streak: number;
   completions: string[];
+}
+
+// Generate GitHub-style heat map data
+function HabitHeatMap({ completions }: { completions: string[] }) {
+  const today = new Date();
+  const days = [];
+  
+  // Generate last 365 days
+  for (let i = 0; i < 365; i++) {
+    const date = new Date();
+    date.setDate(today.getDate() - i);
+    const dateStr = date.toISOString().split("T")[0];
+    const completed = completions.includes(dateStr);
+    days.unshift({ date: dateStr, completed });
+  }
+
+  // Group by weeks
+  const weeks: { date: string; completed: boolean }[][] = [];
+  for (let i = 0; i < days.length; i += 7) {
+    weeks.push(days.slice(i, i + 7));
+  }
+
+  const getOpacity = (completed: boolean) => completed ? "bg-emerald-500" : "bg-zinc-800";
+
+  return (
+    <div className="flex gap-1 overflow-x-auto py-2">
+      {weeks.map((week, weekIndex) => (
+        <div key={weekIndex} className="flex flex-col gap-1">
+          {week.map((day, dayIndex) => (
+            <motion.div
+              key={`${weekIndex}-${dayIndex}`}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: (weekIndex * 7 + dayIndex) * 0.001 }}
+              className={`w-3 h-3 rounded-sm ${getOpacity(day.completed)}`}
+              title={day.date}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export default function HabitTracker({ userId }: { userId: string }) {
@@ -69,42 +113,54 @@ export default function HabitTracker({ userId }: { userId: string }) {
   };
 
   return (
-    <div className="space-y-4">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-4"
+    >
       <div className="flex gap-2">
         <Input
           value={newHabit}
           onChange={(e) => setNewHabit(e.target.value)}
           placeholder="Add new habit..."
-          className="bg-zinc-800 border-zinc-700 text-zinc-100"
+          className="bg-white/5 backdrop-blur-md border border-white/10 text-zinc-100 placeholder:text-zinc-400 focus:border-cyan-500/50"
           onKeyDown={(e) => e.key === "Enter" && addHabit()}
         />
-        <Button onClick={addHabit} className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={addHabit} className="bg-gradient-to-r from-emerald-400 to-teal-600 text-white hover:opacity-90">
           Add
         </Button>
       </div>
       
-      <div className="max-h-[400px] overflow-y-auto pr-2 space-y-3">
+      <div className="max-h-[460px] overflow-y-auto pr-2 space-y-3">
         {habits.map((habit) => (
-          <div key={habit.id} className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg border border-zinc-700/50">
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                checked={habit.completions.includes(selectedDate)}
-                onChange={() => toggleHabit(habit)}
-                className="h-5 w-5 rounded border-zinc-600 bg-zinc-800 checked:bg-blue-600"
-              />
-              <span className="font-medium text-zinc-100">{habit.name}</span>
+          <motion.div
+            key={habit.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="p-3 bg-white/5 backdrop-blur-md rounded-lg border border-white/10 space-y-3"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={habit.completions.includes(selectedDate)}
+                  onChange={() => toggleHabit(habit)}
+                  className="h-5 w-5 rounded border-white/30 bg-white/5 checked:bg-emerald-500"
+                />
+                <span className="font-medium text-zinc-100">{habit.name}</span>
+              </div>
+              <Badge className="bg-gradient-to-r from-emerald-400 to-teal-600 text-white capitalize border-0">
+                {habit.streak} day streak
+              </Badge>
             </div>
-            <Badge variant="secondary" className="capitalize">
-              {habit.streak} day streak
-            </Badge>
-          </div>
+            <HabitHeatMap completions={habit.completions} />
+          </motion.div>
         ))}
       </div>
       
       {habits.length === 0 && (
         <p className="text-zinc-500 text-sm text-center py-4">No habits yet. Add your first habit above!</p>
       )}
-    </div>
+    </motion.div>
   );
 }

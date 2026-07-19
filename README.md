@@ -1,27 +1,30 @@
 # Life OS Hub - Personal Dashboard
 
-A comprehensive, unified, and highly secure personal dashboard built with Next.js, Firebase, and Google Workspace APIs.
+A comprehensive, unified, and highly secure personal dashboard built with Next.js, Firebase, and Google Workspace APIs. Features a premium glassmorphism UI with vibrant gradients and smooth micro-interactions.
 
 ## Features
 
 ### Command Center
-- Daily morning affirmation with mood tracker
-- Quick important notes (Sticky Notes widget)
-- Habit tracker overview
+- Daily morning affirmation popup (first login of each day)
+- Mood tracker with emoji feedback
+- Quick important notes (Sticky Notes widget) with animation
+- Habit tracker overview with GitHub-style heat map
 
 ### Task Tracker (ClickUp-inspired)
 - List view and Kanban board toggle
 - Priority tags (low, medium, high)
-- Automatic archiving to Firestore and Google Sheets
+- Status columns: To Do, In Progress, Review, Done
+- Automatic archiving to Firestore when moved to Done
+- Smooth slide-out animations when tasks are completed
 
 ### Finance Tracker
 - CSV import for banking transactions (PapaParse)
 - Net Worth tracking with charts
-- Income/Expense summaries
+- Income/Expense summaries with gradient colors
 
 ### Habit Tracker
 - Daily habit tracking with streaks
-- GitHub-style habit grid
+- GitHub-style habit grid (365-day visualization)
 - Custom recurrence intervals
 
 ### Agenda Tracker
@@ -30,10 +33,19 @@ A comprehensive, unified, and highly secure personal dashboard built with Next.j
 
 ## Tech Stack
 
-- **Frontend**: Next.js 16 (App Router), Tailwind CSS, Shadcn/ui (Base UI)
-- **Backend**: Firebase (Auth, Firestore, Cloud Functions)
+- **Frontend**: Next.js 16 (App Router), Tailwind CSS, Shadcn/ui (Base UI), Framer Motion
+- **Backend**: Firebase (Firestore), Firebase Functions
 - **Google APIs**: Calendar API, Sheets API
 - **Charts**: Recharts
+
+## Authentication
+
+The application uses a **hardcoded credential** system for secure private access:
+
+- **Username**: `Jek`
+- **Password**: `JekSelaluBahagiadanTajir`
+
+Session is stored in sessionStorage for security.
 
 ## Setup
 
@@ -47,16 +59,14 @@ cp .env.example .env.local
 
 Required variables:
 - Firebase configuration (API key, project ID, etc.)
-- `NEXT_PUBLIC_OWNER_EMAIL` - Your whitelisted Google account
 - Google OAuth credentials (for Calendar API)
 - `SHEET_ID` - Google Sheets ID for archiving
 
 ### 2. Firebase Setup
 
 1. Create a Firebase project
-2. Enable Google Authentication
-3. Set Firestore rules using `firestore.rules`
-4. Deploy Cloud Functions for Google Sheets archiving
+2. Configure Firestore with `firestore.rules`
+3. Deploy Cloud Functions for Google Sheets archiving
 
 ### 3. Google API Setup
 
@@ -77,15 +87,25 @@ npm install
 npm run dev
 ```
 
+## UI/UX Design
+
+- **Base Theme**: Dark Mode (Zinc 950 background)
+- **Glassmorphism**: Frosted glass cards with `backdrop-blur-md` and border transparency
+- **Premium Gradients**:
+  - Aurora Gradient: `from-cyan-500 via-blue-600 to-indigo-600` (Primary)
+  - Abundance Gradient: `from-emerald-400 to-teal-600` (Success)
+  - Execution Gradient: `from-amber-400 to-orange-600` (Warning/Urgency)
+- **Ambient Glow**: Animated blurred backgrounds for depth
+
 ## Security
 
-- Only whitelisted Google account can access
-- Firebase Firestore rules restrict access
+- Hardcoded master credential authentication
+- Firebase Firestore rules restrict data access
 - Environment variables protect sensitive data
 
 ## Deployment
 
-Deploy to Vercel or Netlify with the Firebase environment variables configured.
+Deploy to Vercel with the Firebase and Google API environment variables configured.
 
 ## License
 
