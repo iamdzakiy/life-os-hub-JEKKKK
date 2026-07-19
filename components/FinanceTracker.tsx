@@ -1,24 +1,35 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, onSnapshot, addDoc } from "firebase/firestore";
+import { collection, onSnapshot, addDoc, query, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { motion, AnimatePresence } from "framer-motion";
+import { format, subDays } from "date-fns";
+import {
+  TrendingUp, TrendingDown, Wallet, PiggyBank,
+  Download, Plus, X, Calendar, Filter
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { Heart, Plus, Download } from "lucide-react";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
-import { motion, AnimatePresence } from "framer-motion";
-import { format } from "date-fns";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+  DialogFooter, DialogClose
+} from "@/components/ui/dialog";
+import {
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
+  Tooltip, PieChart, Pie, Cell
+} from "recharts";
 
+// Types
 interface Transaction {
   id: string;
   date: string;
   description: string;
-  amount: number;
-  type: "income" | "expense";
+  amount: number; // positive = income, negative = expense
   category: string;
+  type: "income" | "expense";
   timestamp: Date;
 }
 
@@ -28,56 +39,33 @@ interface SavingsTarget {
   targetAmount: number;
   currentAmount: number;
   deadline: string;
-  createdAt: Date;
+  icon?: string;
 }
 
-interface ChartDataPoint {
-  date: string;
-  expense: number;
-  income: number;
-}
-
-const EXPENSE_CATEGORIES = [
-  "Food & Dining", "Transportation", "Shopping", "Entertainment", 
-  "Bills & Utilities", "Health", "Education", "Investment", "Other"
-];
-
-const INCOME_CATEGORIES = [
-  "Salary", "Freelance", "Investment", "Gift", "Other"
-];
-
-type TransactionForm = {
-  description: string;
-  amount: string;
-  type: "income" | "expense";
-  category: string;
-  date: string;
-};
-
-type ReportRange = {
-  startDate: string;
-  endDate: string;
-};
+const COLORS = ["#00C9A7", "#9B5DE5", "#F15BB5", "#FEE440", "#00BBF9"];
 
 export default function FinanceTracker({ userId }: { userId: string }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [savingsTargets, setSavingsTargets] = useState<SavingsTarget[]>([]);
-  const [isAddingModalOpen, setIsAddingModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [newTransaction, setNewTransaction] = useState<TransactionForm>({
-    description: "",
-    amount: "",
-    type: "expense",
-    category: "",
-    date: format(new Date(), "yyyy-MM-dd"),
-  });
-  const [reportRange, setReportRange] = useState<ReportRange>({
-    startDate: format(new Date(), "yyyy-MM-dd"),
+  const [reportRange, setReportRange] = useState({
+    startDate: format(subDays(new Date(), 30), "yyyy-MM-dd"),
     endDate: format(new Date(), "yyyy-MM-dd"),
   });
 
+  const [newTx, setNewTx] = useState({
+    description: "",
+    amount: "",
+    type: "expense" as "income" | "expense",
+    category: "",
+    date: format(new Date(), "yyyy-MM-dd"),
+  });
+
+  // Fetch data
   useEffect(() => {
-    const unsub1 = onSnapshot(collection(db, "users", userId, "transactions"), (snapshot) => {
+    const q = query(collection(db, "users", userId, "transactions"), orderBy("date", "desc"));
+    const unsub1 = onSnapshot(q, (snapshot) => {
       setTransactions(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Transaction)));
     });
     const unsub2 = onSnapshot(collection(db, "users", userId, "savings_targets"), (snapshot) => {
@@ -86,412 +74,243 @@ export default function FinanceTracker({ userId }: { userId: string }) {
     return () => { unsub1(); unsub2(); };
   }, [userId]);
 
+  // Calculations
+  const totalIncome = transactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+  const totalExpense = transactions.filter(t => t.type === "expense").reduce((s, t) => s + Math.abs(t.amount), 0);
+  const balance = totalIncome - totalExpense;
+  const savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
+
+  // Chart data: last 30 days
+  const chartData = [...Array(30)].map((_, i) => {
+    const date = format(subDays(new Date(), 29 - i), "MMM dd");
+    const dayTxs = transactions.filter(t => format(new Date(t.date), "MMM dd") === date);
+    const income = dayTxs.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+    const expense = dayTxs.filter(t => t.type === "expense").reduce((s, t) => s + Math.abs(t.amount), 0);
+    return { date, income, expense };
+  });
+
   const addTransaction = async () => {
-    if (!newTransaction.description || !newTransaction.amount || !newTransaction.category) return;
-    
+    if (!newTx.description || !newTx.amount || !newTx.category) return;
     await addDoc(collection(db, "users", userId, "transactions"), {
-      description: newTransaction.description,
-      amount: newTransaction.type === "expense" ? -Math.abs(parseFloat(newTransaction.amount)) : Math.abs(parseFloat(newTransaction.amount)),
-      type: newTransaction.type,
-      category: newTransaction.category,
-      date: newTransaction.date,
+      description: newTx.description,
+      amount: newTx.type === "expense" ? -Math.abs(parseFloat(newTx.amount)) : Math.abs(parseFloat(newTx.amount)),
+      type: newTx.type,
+      category: newTx.category,
+      date: newTx.date,
       timestamp: new Date(),
     });
-    
-    setNewTransaction({
-      description: "",
-      amount: "",
-      type: "expense",
-      category: "",
-      date: format(new Date(), "yyyy-MM-dd"),
-    });
-    setIsAddingModalOpen(false);
-  };
-
-  const calculateFinancialHealth = () => {
-    const totalIncome = transactions.filter(t => t.type === "income").reduce((sum, t) => sum + t.amount, 0);
-    const totalExpense = Math.abs(transactions.filter(t => t.type === "expense").reduce((sum, t) => sum + t.amount, 0));
-    const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpense) / totalIncome) * 100 : 0;
-    const healthScore = Math.max(0, Math.min(100, savingsRate * 20 + 20));
-    return Math.round(healthScore);
-  };
-
-  const getHealthMessage = (score: number) => {
-    if (score >= 80) return "Excellent! Your finances are in great shape 💚";
-    if (score >= 60) return "Good! Keep building your savings momentum 💙";
-    if (score >= 40) return "Fair. Consider reviewing your spending habits 💛";
-    return "Needs attention. Start with small daily savings changes 🤍";
+    setNewTx({ description: "", amount: "", type: "expense", category: "", date: format(new Date(), "yyyy-MM-dd") });
+    setIsAddModalOpen(false);
   };
 
   const generateReport = () => {
     const filtered = transactions.filter(t => {
-      const tDate = new Date(t.date);
-      const start = new Date(reportRange.startDate);
-      const end = new Date(reportRange.endDate);
-      return tDate >= start && tDate <= end;
+      const d = new Date(t.date);
+      return d >= new Date(reportRange.startDate) && d <= new Date(reportRange.endDate);
     });
-    
-    const income = filtered.filter(t => t.type === "income").reduce((sum, t) => sum + t.amount, 0);
-    const expense = Math.abs(filtered.filter(t => t.type === "expense").reduce((sum, t) => sum + t.amount, 0));
-    
-    const reportData = {
-      period: `${format(new Date(reportRange.startDate), "MMM dd")} - ${format(new Date(reportRange.endDate), "MMM dd")}`,
-      totalIncome: income,
-      totalExpense: expense,
-      netSavings: income - expense,
-      transactions: filtered,
-    };
-    
-    console.log("Finance Report:", reportData);
-    alert(`Report generated! Check console for details.\nIncome: Rp${income.toLocaleString()}\nExpense: Rp${expense.toLocaleString()}`);
+    const inc = filtered.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+    const exp = filtered.filter(t => t.type === "expense").reduce((s, t) => s + Math.abs(t.amount), 0);
+    alert(`📊 Report (${reportRange.startDate} → ${reportRange.endDate})\n\nIncome: Rp ${inc.toLocaleString()}\nExpense: Rp ${exp.toLocaleString()}\nNet: Rp ${(inc - exp).toLocaleString()}\nTransactions: ${filtered.length}`);
     setIsReportModalOpen(false);
   };
 
-  // Prepare chart data - monthly spending
-  const chartData: ChartDataPoint[] = transactions
-    .filter(t => t.type === "expense")
-    .reduce((acc, t) => {
-      const month = format(new Date(t.date), "MMM dd");
-      const existing = acc.find(d => d.date === month);
-      if (existing) {
-        existing.expense += Math.abs(t.amount);
-      } else {
-        acc.push({ date: month, expense: Math.abs(t.amount), income: 0 });
-      }
-      return acc;
-    }, [] as ChartDataPoint[])
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .slice(-30);
-
-  const totalSavings = savingsTargets.reduce((sum, t) => sum + t.currentAmount, 0);
-  const totalTarget = savingsTargets.reduce((sum, t) => sum + t.targetAmount, 0);
-  const overallProgress = totalTarget > 0 ? (totalSavings / totalTarget) * 100 : 0;
-  
-  const financialHealth = calculateFinancialHealth();
-
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-[#1A2A6C] via-[#2A3A7C] to-[#4A90E2] pb-20">
-      {/* Ambient Glow Background */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-[#00C9A7]/10 rounded-full filter blur-3xl opacity-30 animate-pulse" />
-      <div className="absolute bottom-40 left-0 w-80 h-80 bg-[#9B5DE5]/10 rounded-full filter blur-3xl opacity-20" />
-      
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="relative z-10 p-4 space-y-6"
-      >
-        {/* Main Savings Card */}
-        <Card className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
-          <CardContent className="p-6 text-center">
-            <p className="text-white/70 text-sm font-medium mb-2">Total Savings</p>
-            <h2 className="text-4xl font-bold text-transparent bg-gradient-to-r from-[#00C9A7] to-[#9B5DE5] bg-clip-text mb-4">
-              Rp {totalSavings.toLocaleString()}
-            </h2>
-            <p className="text-white/60 text-xs">
-              from {savingsTargets.length} savings goal{savingsTargets.length !== 1 ? 's' : ''}
-            </p>
-          </CardContent>
-        </Card>
+    <div className="space-y-6">
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <GlassCard icon={<Wallet className="h-5 w-5 text-emerald-400" />} label="Balance" value={`Rp ${balance.toLocaleString()}`} trend={balance >= 0 ? "positive" : "negative"} />
+        <GlassCard icon={<TrendingUp className="h-5 w-5 text-cyan-400" />} label="Income" value={`Rp ${totalIncome.toLocaleString()}`} />
+        <GlassCard icon={<TrendingDown className="h-5 w-5 text-rose-400" />} label="Expenses" value={`Rp ${totalExpense.toLocaleString()}`} />
+        <GlassCard icon={<PiggyBank className="h-5 w-5 text-purple-400" />} label="Savings Rate" value={`${savingsRate.toFixed(1)}%`} />
+      </div>
 
-        {/* Financial Health Score */}
-        <Card className="bg-white/10 backdrop-blur-xl border border-white/20">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-white/70 text-sm font-medium">Financial Health</p>
-                <p className="text-3xl font-bold text-white">{financialHealth}/100</p>
-              </div>
-              <Heart className={`h-10 w-10 ${financialHealth >= 60 ? 'text-[#00C9A7]' : financialHealth >= 40 ? 'text-[#F15BB5]' : 'text-white/50'}`} />
-            </div>
-            <p className="text-white/80 text-sm">{getHealthMessage(financialHealth)}</p>
-          </CardContent>
-        </Card>
-
-        {/* Target Savings Progress Ring */}
-        <Card className="bg-white/10 backdrop-blur-xl border border-white/20">
-          <CardContent className="p-6">
-            <p className="text-white/70 text-sm font-medium mb-4">Savings Progress</p>
-            <div className="relative w-32 h-32 mx-auto">
-              <svg className="w-full h-full" viewBox="0 0 100 100">
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="40"
-                  fill="none"
-                  stroke="rgba(255,255,255,0.1)"
-                  strokeWidth="8"
-                />
-                <motion.circle
-                  cx="50"
-                  cy="50"
-                  r="40"
-                  fill="none"
-                  stroke="url(#gradient)"
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                  initial={{ strokeDasharray: 0 }}
-                  animate={{ strokeDasharray: `${overallProgress * 2.5}, 250` }}
-                  style={{ strokeDasharray: `${overallProgress * 2.5}, 250` }}
-                  className="transition-all duration-1000"
-                />
+      {/* Chart + Savings Rings */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="glass-card lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-white text-sm font-medium">30-Day Cashflow</CardTitle>
+          </CardHeader>
+          <CardContent className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData}>
                 <defs>
-                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#00C9A7" />
-                    <stop offset="100%" stopColor="#9B5DE5" />
+                  <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#00C9A7" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="#00C9A7" stopOpacity={0.05} />
+                  </linearGradient>
+                  <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#F15BB5" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="#F15BB5" stopOpacity={0.05} />
                   </linearGradient>
                 </defs>
-                <text x="50" y="50" textAnchor="middle" dominantBaseline="middle" className="text-xl font-bold fill-white">
-                  {Math.round(overallProgress)}%
-                </text>
-              </svg>
-            </div>
-            <p className="text-center text-white/70 text-xs mt-2">
-              Rp {totalSavings.toLocaleString()} / Rp {totalTarget.toLocaleString()}
-            </p>
+                <XAxis dataKey="date" stroke="#a1a1aa" fontSize={10} tickLine={false} />
+                <YAxis stroke="#a1a1aa" fontSize={10} tickLine={false} axisLine={false} />
+                <Tooltip contentStyle={{ background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", backdropFilter: "blur(10px)" }} />
+                <Area type="monotone" dataKey="income" stroke="#00C9A7" fill="url(#incomeGrad)" strokeWidth={2} />
+                <Area type="monotone" dataKey="expense" stroke="#F15BB5" fill="url(#expenseGrad)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Cashflow Chart */}
-        <Card className="bg-white/10 backdrop-blur-xl border border-white/20">
+        <Card className="glass-card">
           <CardHeader>
-            <CardTitle className="text-white text-sm">Monthly Spending</CardTitle>
+            <CardTitle className="text-white text-sm font-medium">Savings Goals</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
-                  <defs>
-                    <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#F15BB5" stopOpacity={0.8} />
-                      <stop offset="100%" stopColor="#F15BB5" stopOpacity={0.1} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="date" stroke="#e4e4e7" fontSize={10} />
-                  <YAxis stroke="#e4e4e7" fontSize={10} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "rgba(255,255,255,0.1)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      backdropFilter: "blur(10px)",
-                      color: "white"
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="expense"
-                    stroke="#F15BB5"
-                    fill="url(#expenseGradient)"
-                    strokeWidth={2}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+          <CardContent className="space-y-4">
+            {savingsTargets.length === 0 ? (
+              <p className="text-white/40 text-sm text-center py-4">No savings goals set</p>
+            ) : (
+              savingsTargets.map((target, idx) => {
+                const progress = Math.min(100, (target.currentAmount / target.targetAmount) * 100);
+                return (
+                  <div key={target.id} className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-white/70">{target.title}</span>
+                      <span className="text-white/50">{progress.toFixed(0)}%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full"
+                        style={{ background: COLORS[idx % COLORS.length] }}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progress}%` }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-[10px] text-white/40">
+                      <span>Rp {target.currentAmount.toLocaleString()}</span>
+                      <span>Rp {target.targetAmount.toLocaleString()}</span>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+            <Button variant="ghost" size="sm" className="w-full text-white/50 hover:text-white/80 text-xs border border-white/10">
+              + Add Goal
+            </Button>
           </CardContent>
         </Card>
+      </div>
 
-        {/* Recent Expenses (Pengeluaran) */}
-        <Card className="bg-white/10 backdrop-blur-xl border border-white/20">
-          <CardHeader>
-            <CardTitle className="text-white text-sm flex items-center justify-between">
-              Recent Expenses
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsReportModalOpen(true)}
-                className="text-[#00C9A7] hover:bg-white/10"
+      {/* Recent Transactions */}
+      <Card className="glass-card">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-white text-sm font-medium">Recent Transactions</CardTitle>
+          <Button variant="ghost" size="sm" onClick={() => setIsReportModalOpen(true)} className="text-white/50 hover:text-white/80">
+            <Download className="h-4 w-4 mr-1" /> Report
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+            {transactions.slice(0, 10).map((t) => (
+              <motion.div
+                key={t.id}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5 hover:border-white/15 transition-all"
               >
-                <Download className="h-4 w-4" />
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-2">
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              <AnimatePresence>
-                {transactions
-                  .filter(t => t.type === "expense")
-                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                  .slice(0, 10)
-                  .map((t) => (
-                    <motion.div
-                      key={t.id}
-                      initial={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -100 }}
-                      className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10"
-                    >
-                      <div className="flex-1">
-                        <p className="text-white font-medium text-sm">{t.description}</p>
-                        <p className="text-white/60 text-xs">{t.category} &bull; {format(new Date(t.date), "dd MMM")}</p>
-                      </div>
-                      <p className="text-[#F15BB5] font-semibold text-sm">
-                        -Rp {Math.abs(t.amount).toLocaleString()}
-                      </p>
-                    </motion.div>
-                  ))}
-              </AnimatePresence>
-              {transactions.filter(t => t.type === "expense").length === 0 && (
-                <p className="text-center text-white/50 text-sm py-4">No expenses recorded yet</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${t.type === "income" ? "bg-emerald-500/20 text-emerald-400" : "bg-rose-500/20 text-rose-400"}`}>
+                    {t.type === "income" ? "+" : "–"}
+                  </div>
+                  <div>
+                    <p className="text-white text-sm font-medium">{t.description}</p>
+                    <p className="text-white/30 text-xs">{t.category} • {format(new Date(t.date), "dd MMM yyyy")}</p>
+                  </div>
+                </div>
+                <p className={`text-sm font-semibold ${t.type === "income" ? "text-emerald-400" : "text-rose-400"}`}>
+                  {t.type === "income" ? "+" : "–"}Rp {Math.abs(t.amount).toLocaleString()}
+                </p>
+              </motion.div>
+            ))}
+            {transactions.length === 0 && (
+              <p className="text-white/30 text-sm text-center py-8">No transactions yet. Tap + to add one.</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Floating Action Button */}
+      {/* FAB */}
       <motion.button
-        whileTap={{ scale: 0.9 }}
         whileHover={{ scale: 1.05 }}
-        onClick={() => setIsAddingModalOpen(true)}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-gradient-to-r from-[#00C9A7] to-[#9B5DE5] rounded-full shadow-2xl flex items-center justify-center z-20"
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setIsAddModalOpen(true)}
+        className="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 shadow-lg shadow-purple-500/30 flex items-center justify-center z-20 border border-white/20"
       >
-        <Plus className="h-7 w-7 text-white" />
+        <Plus className="h-6 w-6 text-white" />
       </motion.button>
 
       {/* Add Transaction Modal */}
-      <AnimatePresence>
-        {isAddingModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end justify-center z-30 p-4"
-            onClick={() => setIsAddingModalOpen(false)}
-          >
-            <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-t-3xl w-full max-w-md p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="text-white font-semibold text-lg mb-4">Add Transaction</h3>
-              <div className="space-y-4">
-                <Select
-                  value={newTransaction.type}
-                  onValueChange={(v: string | null) => setNewTransaction({ ...newTransaction, type: (v ?? "expense") as "income" | "expense" })}
-                >
-                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="income">Income (Pemasukan)</SelectItem>
-                    <SelectItem value="expense">Expense (Pengeluaran)</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <Input
-                  placeholder="Description"
-                  value={newTransaction.description}
-                  onChange={(e) => setNewTransaction({ ...newTransaction, description: e.target.value })}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                />
-                
-                <Input
-                  type="number"
-                  placeholder="Amount (Rp)"
-                  value={newTransaction.amount}
-                  onChange={(e) => setNewTransaction({ ...newTransaction, amount: e.target.value })}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                />
-                
-                <Select
-                  value={newTransaction.category}
-                  onValueChange={(v: string | null) => setNewTransaction({ ...newTransaction, category: v ?? "" })}
-                >
-                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                    <SelectValue placeholder="Select Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(newTransaction.type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map(c => (
-                      <SelectItem key={c} value={c}>{c}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                <Input
-                  type="date"
-                  value={newTransaction.date}
-                  onChange={(e) => setNewTransaction({ ...newTransaction, date: e.target.value ?? "" })}
-                  className="bg-white/10 border-white/20 text-white"
-                />
-                
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsAddingModalOpen(false)}
-                    className="flex-1 bg-white/5 border-white/20 text-white"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={addTransaction}
-                    className="flex-1 bg-gradient-to-r from-[#00C9A7] to-[#9B5DE5] text-white"
-                  >
-                    Add
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+        <DialogContent className="glass-card border-white/20 text-white max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-white">Add Transaction</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <Select value={newTx.type} onValueChange={(v: any) => setNewTx({ ...newTx, type: v })}>
+              <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="income">Income</SelectItem>
+                <SelectItem value="expense">Expense</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input placeholder="Description" value={newTx.description} onChange={(e) => setNewTx({ ...newTx, description: e.target.value })} className="bg-white/10 border-white/20 text-white placeholder:text-white/30" />
+            <Input type="number" placeholder="Amount" value={newTx.amount} onChange={(e) => setNewTx({ ...newTx, amount: e.target.value })} className="bg-white/10 border-white/20 text-white placeholder:text-white/30" />
+            <Input type="date" value={newTx.date} onChange={(e) => setNewTx({ ...newTx, date: e.target.value })} className="bg-white/10 border-white/20 text-white" />
+          </div>
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="outline" className="bg-white/5 border-white/20 text-white">Cancel</Button>
+            </DialogClose>
+            <Button onClick={addTransaction} className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white">Add</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* Report Generator Modal */}
-      <AnimatePresence>
-        {isReportModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-30 p-4"
-            onClick={() => setIsReportModalOpen(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl w-full max-w-sm p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="text-white font-semibold text-lg mb-4">Generate Report</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-white/70 text-xs mb-1 block">Start Date</label>
-                  <Input
-                    type="date"
-                    value={reportRange.startDate}
-                    onChange={(e) => setReportRange({ ...reportRange, startDate: e.target.value ?? "" })}
-                    className="bg-white/10 border-white/20 text-white"
-                  />
-                </div>
-                <div>
-                  <label className="text-white/70 text-xs mb-1 block">End Date</label>
-                  <Input
-                    type="date"
-                    value={reportRange.endDate}
-                    onChange={(e) => setReportRange({ ...reportRange, endDate: e.target.value ?? "" })}
-                    className="bg-white/10 border-white/20 text-white"
-                  />
-                </div>
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsReportModalOpen(false)}
-                    className="flex-1 bg-white/5 border-white/20 text-white"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={generateReport}
-                    className="flex-1 bg-gradient-to-r from-[#00C9A7] to-[#9B5DE5] text-white"
-                  >
-                    Generate
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Report Modal */}
+      <Dialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
+        <DialogContent className="glass-card border-white/20 text-white max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-white">Generate Report</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-white/50 text-xs">Start Date</label>
+              <Input type="date" value={reportRange.startDate} onChange={(e) => setReportRange({ ...reportRange, startDate: e.target.value })} className="bg-white/10 border-white/20 text-white" />
+            </div>
+            <div>
+              <label className="text-white/50 text-xs">End Date</label>
+              <Input type="date" value={reportRange.endDate} onChange={(e) => setReportRange({ ...reportRange, endDate: e.target.value })} className="bg-white/10 border-white/20 text-white" />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="outline" className="bg-white/5 border-white/20 text-white">Cancel</Button>
+            </DialogClose>
+            <Button onClick={generateReport} className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white">Generate</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+// Helper GlassCard component
+function GlassCard({ icon, label, value, trend }: { icon: React.ReactNode; label: string; value: string; trend?: "positive" | "negative" }) {
+  return (
+    <Card className="glass-card">
+      <CardContent className="p-4 flex items-center justify-between">
+        <div>
+          <p className="text-white/40 text-xs uppercase tracking-wider">{label}</p>
+          <p className="text-white text-xl font-bold mt-1">{value}</p>
+        </div>
+        <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
+          {icon}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

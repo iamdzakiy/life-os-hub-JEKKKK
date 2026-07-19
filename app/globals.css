@@ -128,3 +128,34 @@
     @apply font-sans;
   }
 }
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes floatOrb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -40px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+.glass-card {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)];
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  @apply border-white/20 shadow-[0_8px_40px_rgba(0,0,0,0.4)];
+  transform: translateY(-2px);
+}
+
+.gradient-mesh {
+  background: radial-gradient(circle at 20% 50%, rgba(0, 201, 167, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(155, 93, 229, 0.12) 0%, transparent 50%),
+              radial-gradient(circle at 50% 80%, rgba(241, 91, 181, 0.08) 0%, transparent 50%),
+              #0a0a0f;
+  background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite;
+}

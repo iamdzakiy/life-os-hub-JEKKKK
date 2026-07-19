@@ -19,10 +19,10 @@ export default function DashboardPage() {
     <AuthGuard>
       <div className="relative min-h-screen bg-zinc-950 text-zinc-100 overflow-hidden">
         {/* Ambient Glow Backdrops */}
-        <div className="absolute top-0 left-0 w-72 h-72 bg-cyan-500/20 rounded-full blur-3xl opacity-70 animate-pulse"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl opacity-60"></div>
-        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-indigo-500/15 rounded-full blur-3xl"></div>
-
+        <div className="fixed inset-0 -z-10 gradient-mesh" />
+<div className="fixed top-1/4 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-[floatOrb_8s_ease-in-out_infinite]" />
+<div className="fixed bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-[floatOrb_12s_ease-in-out_infinite_reverse]" />
+<div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
         <motion.header 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -49,21 +49,21 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <Tabs defaultValue="command" className="space-y-6">
-              <TabsList className="bg-white/5 backdrop-blur-md border border-white/10 p-1 rounded-xl">
-                <TabsTrigger value="command" className="data-[state=active]:bg-white/10 data-[state=active]:backdrop-blur-md">
-                  <LayoutDashboard className="mr-2 h-4 w-4" /> Command Center
+            <Tabs defaultValue="dashboard" className="space-y-6">
+              <TabsList className="glass-card p-1 rounded-xl">
+                <TabsTrigger value="dashboard" className="data-[state=active]:bg-white/10">
+                  <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
                 </TabsTrigger>
-                <TabsTrigger value="tasks" className="data-[state=active]:bg-white/10 data-[state=active]:backdrop-blur-md">
-                  <CheckSquare className="mr-2 h-4 w-4" /> Task Tracker
+                <TabsTrigger value="tasks" className="data-[state=active]:bg-white/10">
+                  <CheckSquare className="mr-2 h-4 w-4" /> Tasks
                 </TabsTrigger>
-                <TabsTrigger value="habits" className="data-[state=active]:bg-white/10 data-[state=active]:backdrop-blur-md">
-                  <BarChart3 className="mr-2 h-4 w-4" /> Habit Tracker
+                <TabsTrigger value="habits" className="data-[state=active]:bg-white/10">
+                  <BarChart3 className="mr-2 h-4 w-4" /> Habits
                 </TabsTrigger>
-                <TabsTrigger value="finance" className="data-[state=active]:bg-white/10 data-[state=active]:backdrop-blur-md">
+                <TabsTrigger value="finance" className="data-[state=active]:bg-white/10">
                   <Wallet className="mr-2 h-4 w-4" /> Finance
                 </TabsTrigger>
-                <TabsTrigger value="agenda" className="data-[state=active]:bg-white/10 data-[state=active]:backdrop-blur-md">
+                <TabsTrigger value="agenda" className="data-[state=active]:bg-white/10">
                   <Calendar className="mr-2 h-4 w-4" /> Agenda
                 </TabsTrigger>
               </TabsList>
