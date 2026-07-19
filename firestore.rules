@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Fungsi helper untuk memvalidasi kepemilikan
+    function isOwner() {
+      return request.auth != null && request.auth.token.email == "email_kamu@gmail.com";
+    }
+
+    // Proteksi level dokumen user
+    match /users/{userId} {
+      allow read, write: if isOwner() && userId == request.auth.uid;
+    }
+    
+    // Proteksi level sub-koleksi (tasks, transactions, habits, dll)
+    match /users/{userId}/{document=**} {
+      allow read, write, update, delete: if isOwner() && userId == request.auth.uid;
+    }
+  }
+}
