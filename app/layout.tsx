@@ -1,3 +1,4 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
@@ -33,7 +34,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${plusJakartaSans.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100" style={{ fontFamily: "Tahoma, var(--font-plus-jakarta-sans), sans-serif" }}>
+      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
         {children}
       </body>
     </html>

@@ -2048,170 +2048,6 @@ export async function DELETE(req: Request) {
 }
 </file>
 
-<file path="app/globals.css">
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
-}
-
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
-  }
-}
-
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes floatOrb {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -40px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
-}
-
-.glass-card {
-  @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)];
-  transition: all 0.3s ease;
-}
-
-.glass-card:hover {
-  @apply border-white/20 shadow-[0_8px_40px_rgba(0,0,0,0.4)];
-  transform: translateY(-2px);
-}
-
-.gradient-mesh {
-  background: radial-gradient(circle at 20% 50%, rgba(0, 201, 167, 0.15) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(155, 93, 229, 0.12) 0%, transparent 50%),
-              radial-gradient(circle at 50% 80%, rgba(241, 91, 181, 0.08) 0%, transparent 50%),
-              #0a0a0f;
-  background-size: 200% 200%;
-  animation: gradientShift 15s ease infinite;
-}
-</file>
-
 <file path="app/layout.tsx">
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
@@ -2307,355 +2143,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   if (!authorized) return null;
   
   return <>{children}</>;
-}
-</file>
-
-<file path="components/HabitTracker.tsx">
-"use client";
-
-import { useState, useEffect, useMemo } from "react";
-import { collection, addDoc, updateDoc, doc, onSnapshot, query } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { motion, AnimatePresence, Variants } from "framer-motion";
-import Confetti from "react-confetti";
-
-interface Habit {
-  id: string;
-  name: string;
-  frequency: "daily" | "weekly";
-  streak: number;
-  completions: string[];
-  xp?: number;
-}
-
-// Plant growth stages based on streak length
-function PlantStage({ streak }: { streak: number }) {
-  const stages = [
-    { max: 0, icon: "🌱", label: "Seed", color: "text-emerald-400" },
-    { max: 3, icon: "🌿", label: "Sprout", color: "text-emerald-300" },
-    { max: 7, icon: "🌳", label: "Sapling", color: "text-emerald-500" },
-    { max: 14, icon: "🌺", label: "Bloom", color: "text-pink-400" },
-    { max: 30, icon: "🎋", label: "Tree", color: "text-amber-400" },
-    { max: 60, icon: "🎍", label: "Ancient", color: "text-purple-400" },
-    { max: Infinity, icon: "🌟", label: "Legendary", color: "text-yellow-400" },
-  ];
-
-  const stage = stages.find((s) => streak <= s.max)!;
-
-  return (
-    <motion.div
-      initial={{ scale: 0.8, rotate: -10 }}
-      animate={{ scale: 1, rotate: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="flex items-center gap-1.5"
-    >
-      <span className="text-lg">{stage.icon}</span>
-      <span className={`text-xs font-medium ${stage.color}`}>{stage.label}</span>
-    </motion.div>
-  );
-}
-
-// Weekly progress view with mini-circles (last 30 days)
-function WeeklyProgress({ completions }: { completions: string[] }) {
-  const today = new Date();
-  const days = useMemo(() => {
-    const result: { date: string; completed: boolean; isToday: boolean }[] = [];
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
-      const dateStr = date.toISOString().split("T")[0];
-      const completed = completions.includes(dateStr);
-      const isToday = i === 0;
-      result.push({ date: dateStr, completed, isToday });
-    }
-    return result;
-  }, [completions]);
-
-  // Group into weeks for visual grouping
-  const weeks: { date: string; completed: boolean; isToday: boolean }[][] = [];
-  for (let i = 0; i < days.length; i += 7) {
-    weeks.push(days.slice(i, i + 7));
-  }
-
-  return (
-    <div className="flex gap-1">
-      {weeks.map((week, weekIndex) => (
-        <div key={weekIndex} className="flex flex-col gap-1">
-          {week.map((day, dayIndex) => (
-            <motion.div
-              key={`${weekIndex}-${dayIndex}`}
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: (weekIndex * 7 + dayIndex) * 0.01 }}
-              className={`w-2.5 h-2.5 rounded-full transition-all ${
-                day.completed
-                  ? "bg-gradient-to-r from-emerald-400 to-teal-600 shadow-lg shadow-emerald-400/30"
-                  : day.isToday
-                  ? "bg-cyan-500/50 ring-1 ring-cyan-500"
-                  : "bg-zinc-800"
-              }`}
-              title={day.date}
-            />
-          ))}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Header with total XP bar and level badge
-function HabitHeader({ totalXP, level }: { totalXP: number; level: number }) {
-  const xpForNextLevel = level * 100;
-  const currentLevelXP = (level - 1) * 100;
-  const progressXP = totalXP - currentLevelXP;
-  const progressPercent = Math.min(100, (progressXP / 100) * 100);
-
-  return (
-    <div className="glass-card rounded-xl p-4 mb-4">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-bold text-zinc-100" style={{ fontFamily: "Tahoma, Plus Jakarta Sans, sans-serif" }}>
-          Habit Garden
-        </h2>
-        <Badge className="bg-gradient-to-r from-amber-400 to-yellow-600 text-zinc-900 font-bold px-3 py-1">
-          Level {level}
-        </Badge>
-      </div>
-
-      <div className="space-y-2">
-        <div className="flex justify-between text-xs">
-          <span className="text-zinc-400">Total XP: {totalXP}</span>
-          <span className="text-zinc-400">{progressXP} / {xpForNextLevel} XP</span>
-        </div>
-        <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
-          <motion.div
-            className="h-full bg-gradient-to-r from-emerald-400 to-teal-600"
-            initial={{ width: 0 }}
-            animate={{ width: `${progressPercent}%` }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Framer Motion variants for smooth reorder animations
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.05 },
-  },
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20, scale: 0.95 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { type: "spring", stiffness: 300, damping: 25 },
-  },
-  exit: { opacity: 0, y: -20, scale: 0.95 },
-};
-
-export default function HabitTracker({ userId }: { userId: string }) {
-  const [habits, setHabits] = useState<Habit[]>([]);
-  const [newHabit, setNewHabit] = useState("");
-  const [showConfetti, setShowConfetti] = useState(false);
-  const selectedDate = useMemo(() => new Date().toISOString().split("T")[0], []);
-
-  // Calculate total XP and level
-  const { totalXP, level } = useMemo(() => {
-    const xp = habits.reduce((sum, h) => sum + (h.xp || h.streak * 10), 0);
-    const lvl = Math.floor(xp / 100) + 1;
-    return { totalXP: xp, level: lvl };
-  }, [habits]);
-
-  useEffect(() => {
-    const habitsRef = collection(db, "users", userId, "habits");
-    const q = query(habitsRef);
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const habitsData = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Habit));
-      setHabits(habitsData);
-    });
-    return () => unsubscribe();
-  }, [userId]);
-
-  const addHabit = async () => {
-    if (!newHabit.trim()) return;
-    await addDoc(collection(db, "users", userId, "habits"), {
-      name: newHabit,
-      frequency: "daily",
-      streak: 0,
-      completions: [],
-      xp: 0,
-      createdAt: new Date(),
-    });
-    setNewHabit("");
-  };
-
-  const toggleHabit = async (habit: Habit) => {
-    const habitRef = doc(db, "users", userId, "habits", habit.id);
-    const wasCompleted = habit.completions.includes(selectedDate);
-    const newCompletions = wasCompleted
-      ? habit.completions.filter((d) => d !== selectedDate)
-      : [...habit.completions, selectedDate];
-
-    const newStreak = calculateStreak(newCompletions);
-    const xpEarned = wasCompleted ? 0 : newStreak * 10;
-    const newXP = (habit.xp || 0) + xpEarned;
-
-    await updateDoc(habitRef, {
-      completions: newCompletions,
-      streak: newStreak,
-      xp: newXP,
-    });
-
-    // Trigger confetti on completion
-    if (!wasCompleted) {
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3000);
-    }
-  };
-
-  const calculateStreak = (completions: string[]): number => {
-    if (completions.length === 0) return 0;
-
-    const sortedDates = [...completions].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-    let streak = 1;
-
-    for (let i = 1; i < sortedDates.length; i++) {
-      const prevDate = new Date(sortedDates[i - 1]);
-      const curr = new Date(sortedDates[i]);
-      const diffDays = (prevDate.getTime() - curr.getTime()) / (1000 * 60 * 60 * 24);
-
-      if (diffDays === 1) {
-        streak++;
-      } else if (diffDays > 1) {
-        break;
-      }
-    }
-    return streak;
-  };
-
-  // Auto-sort: completed habits to bottom
-  const sortedHabits = useMemo(() => {
-    return [...habits].sort((a, b) => {
-      const aCompleted = a.completions.includes(selectedDate);
-      const bCompleted = b.completions.includes(selectedDate);
-      if (aCompleted && !bCompleted) return 1;
-      if (!aCompleted && bCompleted) return -1;
-      return 0;
-    });
-  }, [habits, selectedDate]);
-
-  return (
-    <div className="space-y-4">
-      {/* Confetti effect */}
-      {showConfetti && (
-        <Confetti
-          width={400}
-          height={400}
-          recycle={false}
-          numberOfPieces={100}
-          colors={["#10b981", "#0d9488", "#06b6d4", "#8b5cf6", "#f59e0b"]}
-        />
-      )}
-
-      {/* Header with XP and Level */}
-      <HabitHeader totalXP={totalXP} level={level} />
-
-      {/* Add Habit Form */}
-      <div className="flex gap-2">
-        <Input
-          value={newHabit}
-          onChange={(e) => setNewHabit(e.target.value)}
-          placeholder="Add new habit..."
-          className="bg-white/5 backdrop-blur-md border border-white/10 text-zinc-100 placeholder:text-zinc-400 focus:border-cyan-500/50 font-sans"
-          onKeyDown={(e) => e.key === "Enter" && addHabit()}
-        />
-        <Button
-          onClick={addHabit}
-          className="bg-gradient-to-r from-emerald-400 to-teal-600 text-white hover:opacity-90 font-sans"
-        >
-          Add
-        </Button>
-      </div>
-
-      {/* Habits List */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="max-h-[560px] overflow-y-auto pr-2 space-y-3"
-      >
-        <AnimatePresence>
-          {sortedHabits.map((habit) => {
-            const isCompleted = habit.completions.includes(selectedDate);
-            return (
-              <motion.div
-                key={habit.id}
-                variants={itemVariants}
-                layout
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="glass-card rounded-lg p-3 space-y-3"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <motion.div
-                      whileTap={{ scale: 0.9 }}
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isCompleted}
-                        onChange={() => toggleHabit(habit)}
-                        className="h-5 w-5 rounded border-white/30 bg-white/5 checked:bg-emerald-500 transition-all cursor-pointer"
-                      />
-                    </motion.div>
-                    <span
-                      className={`font-medium text-zinc-100 transition-all ${
-                        isCompleted ? "line-through opacity-60" : ""
-                      }`}
-                      style={{ fontFamily: "Tahoma, Plus Jakarta Sans, sans-serif" }}
-                    >
-                      {habit.name}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <PlantStage streak={habit.streak} />
-                    <Badge className="bg-gradient-to-r from-emerald-400 to-teal-600 text-white capitalize border-0">
-                      {habit.streak} days
-                    </Badge>
-                  </div>
-                </div>
-
-                {/* Weekly Progress View (last 30 days) */}
-                <WeeklyProgress completions={habit.completions} />
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-      </motion.div>
-
-      {habits.length === 0 && (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-zinc-500 text-sm text-center py-8"
-          style={{ fontFamily: "Tahoma, Plus Jakarta Sans, sans-serif" }}
-        >
-          No habits yet. Plant your first habit above! 🌱
-        </motion.p>
-      )}
-    </div>
-  );
 }
 </file>
 
@@ -3213,104 +2700,293 @@ Deploy to Vercel with the Firebase and Google API environment variables configur
 Private - For owner use only.
 </file>
 
-<file path="app/dashboard/page.tsx">
+<file path="app/globals.css">
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --radius: 0.75rem;
+}
+
+:root {
+  --background: oklch(0.08 0 0);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.12 0 0 / 0.5);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.12 0 0 / 0.8);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.8 0.15 160);
+  --primary-foreground: oklch(0.1 0 0);
+  --muted: oklch(0.2 0 0);
+  --muted-foreground: oklch(0.6 0 0);
+  --border: oklch(1 0 0 / 0.1);
+  --input: oklch(1 0 0 / 0.15);
+  --ring: oklch(0.8 0.15 160);
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Premium Glassmorphism Utilities */
+.glass-panel {
+  @apply bg-card/60 backdrop-blur-xl border border-border/50 shadow-[0_8px_32px_rgba(0,0,0,0.2)];
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glass-panel:hover {
+  @apply border-white/20 shadow-[0_8px_40px_rgba(0,0,0,0.3)];
+}
+
+.glass-button {
+  @apply bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-200;
+}
+
+.gradient-text {
+  @apply bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent;
+}
+
+.gradient-mesh {
+  background: 
+    radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+    oklch(0.08 0 0);
+  background-size: 200% 200%;
+  animation: gradientShift 20s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes floatOrb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -40px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { @apply bg-white/10 rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-white/20; }
+</file>
+
+<file path="components/HabitTracker.tsx">
 "use client";
+import { useState, useEffect, useMemo } from "react";
+import { collection, addDoc, updateDoc, doc, onSnapshot, query, deleteDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { motion, AnimatePresence } from "framer-motion";
+import { Flame, Check, Plus, Trash2 } from "lucide-react";
+import Confetti from "react-confetti";
 
-import AuthGuard, { signOut } from "@/components/AuthGuard";
-import MorningPopup from "@/components/MorningPopup";
-import StickyNotes from "@/components/StickyNotes";
-import TaskTracker from "@/components/TaskTracker";
-import HabitTracker from "@/components/HabitTracker";
-import FinanceTracker from "@/components/FinanceTracker";
-import AgendaTracker from "@/components/AgendaTracker";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LayoutDashboard, CheckSquare, Wallet, Calendar, BarChart3 } from "lucide-react";
-import { motion } from "framer-motion";
+interface Habit {
+  id: string;
+  name: string;
+  streak: number;
+  completions: string[];
+  color: string;
+}
 
-export default function DashboardPage() {
-  // For hardcoded auth, userId is always "Jek"
-  const userId = "Jek";
+const HABIT_COLORS = [
+  "from-emerald-400 to-teal-600",
+  "from-cyan-400 to-blue-600",
+  "from-violet-400 to-purple-600",
+  "from-amber-400 to-orange-600",
+  "from-rose-400 to-pink-600",
+];
+
+function Heatmap({ completions }: { completions: string[] }) {
+  const days = useMemo(() => {
+    const result = [];
+    const today = new Date();
+    for (let i = 83; i >= 0; i--) { // ~12 weeks
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const dateStr = date.toISOString().split("T")[0];
+      const count = completions.filter(d => d === dateStr).length;
+      result.push({ date: dateStr, count: Math.min(count, 1) });
+    }
+    return result;
+  }, [completions]);
 
   return (
-    <AuthGuard>
-      <div className="relative min-h-screen bg-zinc-950 text-zinc-100 overflow-hidden">
-        {/* Ambient Glow Backdrops */}
-        <div className="fixed inset-0 -z-10 gradient-mesh" />
-<div className="fixed top-1/4 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-[floatOrb_8s_ease-in-out_infinite]" />
-<div className="fixed bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-[floatOrb_12s_ease-in-out_infinite_reverse]" />
-<div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
-        <motion.header 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="relative p-6 md:p-10 flex items-center justify-between border-b border-white/5 backdrop-blur-sm"
-        >
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Life OS Hub
-            </h1>
-            <p className="text-zinc-400">Welcome back, {userId}.</p>
-          </div>
-          <button 
-            onClick={signOut}
-            className="text-zinc-400 hover:text-zinc-100 transition-colors px-4 py-2 rounded-lg hover:bg-white/5"
-          >
-            Sign Out
-          </button>
-        </motion.header>
+    <div className="flex gap-1 flex-wrap">
+      {days.map((day, i) => (
+        <motion.div
+          key={day.date}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: i * 0.005 }}
+          className={`w-3 h-3 rounded-sm transition-colors ${
+            day.count === 1 
+              ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" 
+              : "bg-white/5"
+          }`}
+          title={day.date}
+        />
+      ))}
+    </div>
+  );
+}
 
-        <main className="relative p-6 md:p-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <Tabs defaultValue="dashboard" className="space-y-6">
-              <TabsList className="glass-card p-1 rounded-xl">
-                <TabsTrigger value="dashboard" className="data-[state=active]:bg-white/10">
-                  <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
-                </TabsTrigger>
-                <TabsTrigger value="tasks" className="data-[state=active]:bg-white/10">
-                  <CheckSquare className="mr-2 h-4 w-4" /> Tasks
-                </TabsTrigger>
-                <TabsTrigger value="habits" className="data-[state=active]:bg-white/10">
-                  <BarChart3 className="mr-2 h-4 w-4" /> Habits
-                </TabsTrigger>
-                <TabsTrigger value="finance" className="data-[state=active]:bg-white/10">
-                  <Wallet className="mr-2 h-4 w-4" /> Finance
-                </TabsTrigger>
-                <TabsTrigger value="agenda" className="data-[state=active]:bg-white/10">
-                  <Calendar className="mr-2 h-4 w-4" /> Agenda
-                </TabsTrigger>
-              </TabsList>
+export default function HabitTracker({ userId }: { userId: string }) {
+  const [habits, setHabits] = useState<Habit[]>([]);
+  const [newHabit, setNewHabit] = useState("");
+  const [showConfetti, setShowConfetti] = useState(false);
+  const selectedDate = useMemo(() => new Date().toISOString().split("T")[0], []);
 
-              <TabsContent value="command" className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <StickyNotes userId={userId} />
-                <HabitTracker userId={userId} />
-              </TabsContent>
+  useEffect(() => {
+    const habitsRef = collection(db, "users", userId, "habits");
+    const unsubscribe = onSnapshot(query(habitsRef), (snapshot) => {
+      setHabits(snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Habit)));
+    });
+    return () => unsubscribe();
+  }, [userId]);
 
-              <TabsContent value="tasks">
-                <TaskTracker userId={userId} />
-              </TabsContent>
+  const addHabit = async () => {
+    if (!newHabit.trim()) return;
+    await addDoc(collection(db, "users", userId, "habits"), {
+      name: newHabit,
+      streak: 0,
+      completions: [],
+      color: HABIT_COLORS[habits.length % HABIT_COLORS.length],
+      createdAt: new Date(),
+    });
+    setNewHabit("");
+  };
 
-              <TabsContent value="habits">
-                <HabitTracker userId={userId} />
-              </TabsContent>
+  const toggleHabit = async (habit: Habit) => {
+    const habitRef = doc(db, "users", userId, "habits", habit.id);
+    const wasCompleted = habit.completions.includes(selectedDate);
+    const newCompletions = wasCompleted
+      ? habit.completions.filter((d) => d !== selectedDate)
+      : [...habit.completions, selectedDate];
+    
+    let newStreak = 0;
+    if (newCompletions.length > 0) {
+      const sorted = [...newCompletions].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+      newStreak = 1;
+      for (let i = 1; i < sorted.length; i++) {
+        const diff = (new Date(sorted[i-1]).getTime() - new Date(sorted[i]).getTime()) / (1000 * 60 * 60 * 24);
+        if (diff === 1) newStreak++;
+        else break;
+      }
+    }
 
-              <TabsContent value="finance">
-                <FinanceTracker userId={userId} />
-              </TabsContent>
-              
-              <TabsContent value="agenda">
-                <AgendaTracker />
-              </TabsContent>
-            </Tabs>
-          </motion.div>
-        </main>
-      </div>
+    await updateDoc(habitRef, { completions: newCompletions, streak: newStreak });
+
+    if (!wasCompleted) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 2000);
+    }
+  };
+
+  const deleteHabit = async (id: string) => {
+    await deleteDoc(doc(db, "users", userId, "habits", id));
+  };
+
+  return (
+    <div className="space-y-6">
+      {showConfetti && (
+        <Confetti width={window.innerWidth} height={window.innerHeight} recycle={false} numberOfPieces={150} colors={["#10b981", "#06b6d4", "#8b5cf6"]} />
+      )}
       
-      <MorningPopup userId={userId} />
-    </AuthGuard>
+      <div className="flex gap-2">
+        <Input
+          value={newHabit}
+          onChange={(e) => setNewHabit(e.target.value)}
+          placeholder="What habit do you want to build?"
+          className="glass-panel bg-transparent text-zinc-100 placeholder:text-zinc-500 focus:border-emerald-500/50 h-11"
+          onKeyDown={(e) => e.key === "Enter" && addHabit()}
+        />
+        <Button onClick={addHabit} className="h-11 px-6 bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:opacity-90 border-0 shadow-lg shadow-emerald-500/20">
+          <Plus className="h-5 w-5 mr-1" /> Add
+        </Button>
+      </div>
+
+      <div className="space-y-4">
+        <AnimatePresence>
+          {habits.map((habit) => {
+            const isCompleted = habit.completions.includes(selectedDate);
+            return (
+              <motion.div
+                key={habit.id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="glass-panel rounded-xl p-4 space-y-4 group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => toggleHabit(habit)}
+                      className={`relative w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-all ${
+                        isCompleted 
+                          ? `bg-gradient-to-br ${habit.color} border-transparent shadow-lg` 
+                          : "border-white/20 hover:border-white/40 bg-white/5"
+                      }`}
+                    >
+                      <AnimatePresence>
+                        {isCompleted && (
+                          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+                            <Check className="h-5 w-5 text-white" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.button>
+                    <div>
+                      <h3 className={`font-semibold text-lg transition-all ${isCompleted ? "text-zinc-500 line-through" : "text-zinc-100"}`}>
+                        {habit.name}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge className={`bg-gradient-to-r ${habit.color} text-white border-0 text-xs`}>
+                          <Flame className="h-3 w-3 mr-1" /> {habit.streak} day streak
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={() => deleteHabit(habit.id)} className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                <Heatmap completions={habit.completions} />
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+        {habits.length === 0 && (
+          <div className="text-center py-12 glass-panel rounded-xl">
+            <p className="text-zinc-500">No habits yet. Start building your first one above! 🌱</p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 </file>
@@ -3360,96 +3036,176 @@ export default function DashboardPage() {
 }
 </file>
 
+<file path="app/dashboard/page.tsx">
+"use client";
+import AuthGuard, { signOut } from "@/components/AuthGuard";
+import MorningPopup from "@/components/MorningPopup";
+import StickyNotes from "@/components/StickyNotes";
+import TaskTracker from "@/components/TaskTracker";
+import HabitTracker from "@/components/HabitTracker";
+import FinanceTracker from "@/components/FinanceTracker";
+import AgendaTracker from "@/components/AgendaTracker";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LayoutDashboard, CheckSquare, Wallet, Calendar, Sprout, LogOut } from "lucide-react";
+import { motion } from "framer-motion";
+
+export default function DashboardPage() {
+  const userId = "Jek";
+
+  return (
+    <AuthGuard>
+      <div className="relative min-h-screen bg-zinc-950 text-zinc-100 overflow-hidden font-sans">
+        {/* Ambient Glow Backdrops */}
+        <div className="fixed inset-0 -z-10 gradient-mesh" />
+        <div className="fixed top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[100px] animate-[floatOrb_15s_ease-in-out_infinite]" />
+        <div className="fixed bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-[100px] animate-[floatOrb_20s_ease-in-out_infinite_reverse]" />
+        
+        <motion.header 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="sticky top-0 z-50 p-4 md:p-6 flex items-center justify-between border-b border-white/5 bg-zinc-950/50 backdrop-blur-xl"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <LayoutDashboard className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight gradient-text">Life OS Hub</h1>
+              <p className="text-zinc-500 text-xs">Welcome back, {userId}</p>
+            </div>
+          </div>
+          <button 
+            onClick={signOut}
+            className="flex items-center gap-2 text-zinc-400 hover:text-zinc-100 transition-colors px-4 py-2 rounded-lg glass-button"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline">Sign Out</span>
+          </button>
+        </motion.header>
+
+        <main className="relative p-4 md:p-8 max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <Tabs defaultValue="dashboard" className="space-y-6">
+              <TabsList className="glass-panel p-1 rounded-xl w-full md:w-auto grid grid-cols-3 md:grid-cols-5 gap-1">
+                <TabsTrigger value="dashboard" className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-zinc-400">
+                  <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
+                </TabsTrigger>
+                <TabsTrigger value="tasks" className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-zinc-400">
+                  <CheckSquare className="mr-2 h-4 w-4" /> Tasks
+                </TabsTrigger>
+                <TabsTrigger value="habits" className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-zinc-400">
+                  <Sprout className="mr-2 h-4 w-4" /> Habits
+                </TabsTrigger>
+                <TabsTrigger value="finance" className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-zinc-400">
+                  <Wallet className="mr-2 h-4 w-4" /> Finance
+                </TabsTrigger>
+                <TabsTrigger value="agenda" className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-zinc-400">
+                  <Calendar className="mr-2 h-4 w-4" /> Agenda
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="dashboard" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="glass-panel rounded-xl p-6">
+                    <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <Sprout className="h-5 w-5 text-emerald-400" /> Quick Habits
+                    </h2>
+                    <HabitTracker userId={userId} />
+                  </div>
+                  <div className="glass-panel rounded-xl p-6">
+                    <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <CheckSquare className="h-5 w-5 text-cyan-400" /> Quick Notes & Tasks
+                    </h2>
+                    <StickyNotes userId={userId} />
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="tasks">
+                <div className="glass-panel rounded-xl p-6">
+                  <TaskTracker userId={userId} />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="habits">
+                <div className="glass-panel rounded-xl p-6">
+                  <HabitTracker userId={userId} />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="finance">
+                <div className="glass-panel rounded-xl p-6">
+                  <FinanceTracker userId={userId} />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="agenda">
+                <div className="glass-panel rounded-xl p-6">
+                  <AgendaTracker />
+                </div>
+              </TabsContent>
+            </Tabs>
+          </motion.div>
+        </main>
+        <MorningPopup userId={userId} />
+      </div>
+    </AuthGuard>
+  );
+}
+</file>
+
 <file path="components/FinanceTracker.tsx">
 "use client";
-
 import { useState, useEffect } from "react";
-import { collection, onSnapshot, addDoc, query, orderBy } from "firebase/firestore";
+import { collection, onSnapshot, addDoc, query, orderBy, deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { motion, AnimatePresence } from "framer-motion";
 import { format, subDays } from "date-fns";
-import {
-  TrendingUp, TrendingDown, Wallet, PiggyBank,
-  Download, Plus, X, Calendar, Filter
-} from "lucide-react";
+import { Wallet, Plus, ArrowUpRight, ArrowDownRight, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
-  DialogFooter, DialogClose
-} from "@/components/ui/dialog";
-import {
-  ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
-  Tooltip, PieChart, Pie, Cell
-} from "recharts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 
-// Types
 interface Transaction {
   id: string;
   date: string;
   description: string;
-  amount: number; // positive = income, negative = expense
+  amount: number;
   category: string;
   type: "income" | "expense";
-  timestamp: Date;
 }
-
-interface SavingsTarget {
-  id: string;
-  title: string;
-  targetAmount: number;
-  currentAmount: number;
-  deadline: string;
-  icon?: string;
-}
-
-const COLORS = ["#00C9A7", "#9B5DE5", "#F15BB5", "#FEE440", "#00BBF9"];
 
 export default function FinanceTracker({ userId }: { userId: string }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [savingsTargets, setSavingsTargets] = useState<SavingsTarget[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [reportRange, setReportRange] = useState({
-    startDate: format(subDays(new Date(), 30), "yyyy-MM-dd"),
-    endDate: format(new Date(), "yyyy-MM-dd"),
-  });
+  const [newTx, setNewTx] = useState({ description: "", amount: "", type: "expense" as "income" | "expense", category: "", date: format(new Date(), "yyyy-MM-dd") });
 
-  const [newTx, setNewTx] = useState({
-    description: "",
-    amount: "",
-    type: "expense" as "income" | "expense",
-    category: "",
-    date: format(new Date(), "yyyy-MM-dd"),
-  });
-
-  // Fetch data
   useEffect(() => {
     const q = query(collection(db, "users", userId, "transactions"), orderBy("date", "desc"));
-    const unsub1 = onSnapshot(q, (snapshot) => {
+    const unsub = onSnapshot(q, (snapshot) => {
       setTransactions(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Transaction)));
     });
-    const unsub2 = onSnapshot(collection(db, "users", userId, "savings_targets"), (snapshot) => {
-      setSavingsTargets(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as SavingsTarget)));
-    });
-    return () => { unsub1(); unsub2(); };
+    return () => unsub();
   }, [userId]);
 
-  // Calculations
   const totalIncome = transactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
   const totalExpense = transactions.filter(t => t.type === "expense").reduce((s, t) => s + Math.abs(t.amount), 0);
-  const balance = totalIncome - totalExpense;
-  const savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
+  const netWorth = totalIncome - totalExpense;
 
-  // Chart data: last 30 days
   const chartData = [...Array(30)].map((_, i) => {
     const date = format(subDays(new Date(), 29 - i), "MMM dd");
     const dayTxs = transactions.filter(t => format(new Date(t.date), "MMM dd") === date);
     const income = dayTxs.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
     const expense = dayTxs.filter(t => t.type === "expense").reduce((s, t) => s + Math.abs(t.amount), 0);
-    return { date, income, expense };
+    return { date, net: income - expense };
   });
 
   const addTransaction = async () => {
@@ -3460,221 +3216,152 @@ export default function FinanceTracker({ userId }: { userId: string }) {
       type: newTx.type,
       category: newTx.category,
       date: newTx.date,
-      timestamp: new Date(),
     });
     setNewTx({ description: "", amount: "", type: "expense", category: "", date: format(new Date(), "yyyy-MM-dd") });
     setIsAddModalOpen(false);
   };
 
-  const generateReport = () => {
-    const filtered = transactions.filter(t => {
-      const d = new Date(t.date);
-      return d >= new Date(reportRange.startDate) && d <= new Date(reportRange.endDate);
-    });
-    const inc = filtered.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
-    const exp = filtered.filter(t => t.type === "expense").reduce((s, t) => s + Math.abs(t.amount), 0);
-    alert(`📊 Report (${reportRange.startDate} → ${reportRange.endDate})\n\nIncome: Rp ${inc.toLocaleString()}\nExpense: Rp ${exp.toLocaleString()}\nNet: Rp ${(inc - exp).toLocaleString()}\nTransactions: ${filtered.length}`);
-    setIsReportModalOpen(false);
+  const deleteTransaction = async (id: string) => {
+    await deleteDoc(doc(db, "users", userId, "transactions", id));
   };
 
   return (
     <div className="space-y-6">
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <GlassCard icon={<Wallet className="h-5 w-5 text-emerald-400" />} label="Balance" value={`Rp ${balance.toLocaleString()}`} trend={balance >= 0 ? "positive" : "negative"} />
-        <GlassCard icon={<TrendingUp className="h-5 w-5 text-cyan-400" />} label="Income" value={`Rp ${totalIncome.toLocaleString()}`} />
-        <GlassCard icon={<TrendingDown className="h-5 w-5 text-rose-400" />} label="Expenses" value={`Rp ${totalExpense.toLocaleString()}`} />
-        <GlassCard icon={<PiggyBank className="h-5 w-5 text-purple-400" />} label="Savings Rate" value={`${savingsRate.toFixed(1)}%`} />
-      </div>
-
-      {/* Chart + Savings Rings */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="glass-card lg:col-span-2">
+      {/* Net Worth Hero */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="glass-panel md:col-span-2 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -z-10" />
           <CardHeader>
-            <CardTitle className="text-white text-sm font-medium">30-Day Cashflow</CardTitle>
+            <CardTitle className="text-zinc-400 text-sm font-medium flex items-center gap-2">
+              <Wallet className="h-4 w-4" /> Estimated Net Worth
+            </CardTitle>
           </CardHeader>
-          <CardContent className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#00C9A7" stopOpacity={0.8} />
-                    <stop offset="100%" stopColor="#00C9A7" stopOpacity={0.05} />
-                  </linearGradient>
-                  <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#F15BB5" stopOpacity={0.8} />
-                    <stop offset="100%" stopColor="#F15BB5" stopOpacity={0.05} />
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="date" stroke="#a1a1aa" fontSize={10} tickLine={false} />
-                <YAxis stroke="#a1a1aa" fontSize={10} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", backdropFilter: "blur(10px)" }} />
-                <Area type="monotone" dataKey="income" stroke="#00C9A7" fill="url(#incomeGrad)" strokeWidth={2} />
-                <Area type="monotone" dataKey="expense" stroke="#F15BB5" fill="url(#expenseGrad)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
+          <CardContent>
+            <div className="text-4xl font-bold gradient-text mb-6">
+              Rp {netWorth.toLocaleString()}
+            </div>
+            <div className="h-48 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="netGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="date" stroke="#52525b" fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#52525b" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `${val/1000}k`} />
+                  <Tooltip 
+                    contentStyle={{ background: "rgba(24, 24, 27, 0.8)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", backdropFilter: "blur(12px)", color: "#fff" }}
+                    itemStyle={{ color: "#10b981" }}
+                  />
+                  <Area type="monotone" dataKey="net" stroke="#10b981" strokeWidth={3} fill="url(#netGrad)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle className="text-white text-sm font-medium">Savings Goals</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {savingsTargets.length === 0 ? (
-              <p className="text-white/40 text-sm text-center py-4">No savings goals set</p>
-            ) : (
-              savingsTargets.map((target, idx) => {
-                const progress = Math.min(100, (target.currentAmount / target.targetAmount) * 100);
-                return (
-                  <div key={target.id} className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-white/70">{target.title}</span>
-                      <span className="text-white/50">{progress.toFixed(0)}%</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full rounded-full"
-                        style={{ background: COLORS[idx % COLORS.length] }}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                      />
-                    </div>
-                    <div className="flex justify-between text-[10px] text-white/40">
-                      <span>Rp {target.currentAmount.toLocaleString()}</span>
-                      <span>Rp {target.targetAmount.toLocaleString()}</span>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-            <Button variant="ghost" size="sm" className="w-full text-white/50 hover:text-white/80 text-xs border border-white/10">
-              + Add Goal
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <Card className="glass-panel">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-zinc-400 text-xs uppercase tracking-wider">Total Income</p>
+                <p className="text-emerald-400 text-2xl font-bold mt-1 flex items-center gap-2">
+                  <ArrowUpRight className="h-5 w-5" /> Rp {totalIncome.toLocaleString()}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="glass-panel">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-zinc-400 text-xs uppercase tracking-wider">Total Expenses</p>
+                <p className="text-rose-400 text-2xl font-bold mt-1 flex items-center gap-2">
+                  <ArrowDownRight className="h-5 w-5" /> Rp {totalExpense.toLocaleString()}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Recent Transactions */}
-      <Card className="glass-card">
+      <Card className="glass-panel">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-white text-sm font-medium">Recent Transactions</CardTitle>
-          <Button variant="ghost" size="sm" onClick={() => setIsReportModalOpen(true)} className="text-white/50 hover:text-white/80">
-            <Download className="h-4 w-4 mr-1" /> Report
+          <CardTitle className="text-zinc-100 text-sm font-medium">Recent Transactions</CardTitle>
+          <Button variant="ghost" size="sm" onClick={() => setIsAddModalOpen(true)} className="glass-button text-zinc-300 hover:text-white">
+            <Plus className="h-4 w-4 mr-1" /> Add Transaction
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
-            {transactions.slice(0, 10).map((t) => (
-              <motion.div
-                key={t.id}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5 hover:border-white/15 transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${t.type === "income" ? "bg-emerald-500/20 text-emerald-400" : "bg-rose-500/20 text-rose-400"}`}>
-                    {t.type === "income" ? "+" : "–"}
+          <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
+            <AnimatePresence>
+              {transactions.slice(0, 15).map((t) => (
+                <motion.div
+                  key={t.id}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/15 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${t.type === "income" ? "bg-emerald-500/20 text-emerald-400" : "bg-rose-500/20 text-rose-400"}`}>
+                      {t.type === "income" ? "+" : "–"}
+                    </div>
+                    <div>
+                      <p className="text-zinc-100 text-sm font-medium">{t.description}</p>
+                      <p className="text-zinc-500 text-xs">{t.category} • {format(new Date(t.date), "dd MMM yyyy")}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-white text-sm font-medium">{t.description}</p>
-                    <p className="text-white/30 text-xs">{t.category} • {format(new Date(t.date), "dd MMM yyyy")}</p>
+                  <div className="flex items-center gap-4">
+                    <p className={`text-sm font-semibold ${t.type === "income" ? "text-emerald-400" : "text-rose-400"}`}>
+                      {t.type === "income" ? "+" : "–"}Rp {Math.abs(t.amount).toLocaleString()}
+                    </p>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-red-400 hover:bg-red-500/10" onClick={() => deleteTransaction(t.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                </div>
-                <p className={`text-sm font-semibold ${t.type === "income" ? "text-emerald-400" : "text-rose-400"}`}>
-                  {t.type === "income" ? "+" : "–"}Rp {Math.abs(t.amount).toLocaleString()}
-                </p>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </AnimatePresence>
             {transactions.length === 0 && (
-              <p className="text-white/30 text-sm text-center py-8">No transactions yet. Tap + to add one.</p>
+              <div className="text-center py-12 text-zinc-500">No transactions yet. Tap + to add one.</div>
             )}
           </div>
         </CardContent>
       </Card>
 
-      {/* FAB */}
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsAddModalOpen(true)}
-        className="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 shadow-lg shadow-purple-500/30 flex items-center justify-center z-20 border border-white/20"
-      >
-        <Plus className="h-6 w-6 text-white" />
-      </motion.button>
-
       {/* Add Transaction Modal */}
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-        <DialogContent className="glass-card border-white/20 text-white max-w-sm">
+        <DialogContent className="glass-panel border-white/20 text-zinc-100 max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-white">Add Transaction</DialogTitle>
+            <DialogTitle className="text-zinc-100">Add Transaction</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <Select value={newTx.type} onValueChange={(v: any) => setNewTx({ ...newTx, type: v })}>
-              <SelectTrigger className="bg-white/10 border-white/20 text-white">
+              <SelectTrigger className="glass-panel bg-transparent text-zinc-100">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="glass-panel border-white/20 bg-zinc-950/90">
                 <SelectItem value="income">Income</SelectItem>
                 <SelectItem value="expense">Expense</SelectItem>
               </SelectContent>
             </Select>
-            <Input placeholder="Description" value={newTx.description} onChange={(e) => setNewTx({ ...newTx, description: e.target.value })} className="bg-white/10 border-white/20 text-white placeholder:text-white/30" />
-            <Input type="number" placeholder="Amount" value={newTx.amount} onChange={(e) => setNewTx({ ...newTx, amount: e.target.value })} className="bg-white/10 border-white/20 text-white placeholder:text-white/30" />
-            <Input type="date" value={newTx.date} onChange={(e) => setNewTx({ ...newTx, date: e.target.value })} className="bg-white/10 border-white/20 text-white" />
+            <Input placeholder="Description (e.g., Salary, Groceries)" value={newTx.description} onChange={(e) => setNewTx({ ...newTx, description: e.target.value })} className="glass-panel bg-transparent text-zinc-100 placeholder:text-zinc-500" />
+            <Input type="number" placeholder="Amount" value={newTx.amount} onChange={(e) => setNewTx({ ...newTx, amount: e.target.value })} className="glass-panel bg-transparent text-zinc-100 placeholder:text-zinc-500" />
+            <Input placeholder="Category (e.g., Food, Transport)" value={newTx.category} onChange={(e) => setNewTx({ ...newTx, category: e.target.value })} className="glass-panel bg-transparent text-zinc-100 placeholder:text-zinc-500" />
+            <Input type="date" value={newTx.date} onChange={(e) => setNewTx({ ...newTx, date: e.target.value })} className="glass-panel bg-transparent text-zinc-100" />
           </div>
           <DialogFooter className="gap-2">
-            <DialogClose>
-              <Button variant="outline" className="bg-white/5 border-white/20 text-white">Cancel</Button>
+            <DialogClose asChild>
+              <Button variant="outline" className="glass-button text-zinc-300">Cancel</Button>
             </DialogClose>
-            <Button onClick={addTransaction} className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white">Add</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Report Modal */}
-      <Dialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
-        <DialogContent className="glass-card border-white/20 text-white max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-white">Generate Report</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div>
-              <label className="text-white/50 text-xs">Start Date</label>
-              <Input type="date" value={reportRange.startDate} onChange={(e) => setReportRange({ ...reportRange, startDate: e.target.value })} className="bg-white/10 border-white/20 text-white" />
-            </div>
-            <div>
-              <label className="text-white/50 text-xs">End Date</label>
-              <Input type="date" value={reportRange.endDate} onChange={(e) => setReportRange({ ...reportRange, endDate: e.target.value })} className="bg-white/10 border-white/20 text-white" />
-            </div>
-          </div>
-          <DialogFooter className="gap-2">
-            <DialogClose>
-              <Button variant="outline" className="bg-white/5 border-white/20 text-white">Cancel</Button>
-            </DialogClose>
-            <Button onClick={generateReport} className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white">Generate</Button>
+            <Button onClick={addTransaction} className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-0 shadow-lg shadow-emerald-500/20">Add</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
-  );
-}
-
-// Helper GlassCard component
-function GlassCard({ icon, label, value, trend }: { icon: React.ReactNode; label: string; value: string; trend?: "positive" | "negative" }) {
-  return (
-    <Card className="glass-card">
-      <CardContent className="p-4 flex items-center justify-between">
-        <div>
-          <p className="text-white/40 text-xs uppercase tracking-wider">{label}</p>
-          <p className="text-white text-xl font-bold mt-1">{value}</p>
-        </div>
-        <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
-          {icon}
-        </div>
-      </CardContent>
-    </Card>
   );
 }
 </file>
