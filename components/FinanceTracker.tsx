@@ -262,7 +262,7 @@ export default function FinanceTracker({ userId }: { userId: string }) {
             <Input type="date" value={newTx.date} onChange={(e) => setNewTx({ ...newTx, date: e.target.value })} className="bg-white/10 border-white/20 text-white" />
           </div>
           <DialogFooter className="gap-2">
-            <DialogClose asChild>
+            <DialogClose>
               <Button variant="outline" className="bg-white/5 border-white/20 text-white">Cancel</Button>
             </DialogClose>
             <Button onClick={addTransaction} className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white">Add</Button>
@@ -287,7 +287,7 @@ export default function FinanceTracker({ userId }: { userId: string }) {
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <DialogClose asChild>
+            <DialogClose>
               <Button variant="outline" className="bg-white/5 border-white/20 text-white">Cancel</Button>
             </DialogClose>
             <Button onClick={generateReport} className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white">Generate</Button>
