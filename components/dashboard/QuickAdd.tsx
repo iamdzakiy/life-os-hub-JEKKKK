@@ -1,7 +1,7 @@
 // components/dashboard/QuickAdd.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, X, Sparkles, Check, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,25 @@ export default function QuickAdd({ userId }: { userId: string }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Keyboard shortcuts: Ctrl/Cmd + K to open, Escape to close
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + K to open Quick Add
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setIsOpen(true);
+      }
+      
+      // Escape to close
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
 
   const handleSubmit = async () => {
     if (!title.trim()) return;
@@ -49,6 +68,12 @@ export default function QuickAdd({ userId }: { userId: string }) {
     setIsSubmitting(false);
   };
 
+  const handleClose = () => {
+    setTitle("");
+    setDescription("");
+    setIsOpen(false);
+  };
+
   return (
     <>
       {/* Floating Action Button */}
@@ -57,6 +82,7 @@ export default function QuickAdd({ userId }: { userId: string }) {
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
         className="fixed bottom-8 right-8 z-50 h-14 w-14 rounded-full bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-2xl shadow-cyan-500/30 flex items-center justify-center"
+        aria-label="Quick Add"
       >
         <Plus className="h-6 w-6" />
       </motion.button>
@@ -69,7 +95,7 @@ export default function QuickAdd({ userId }: { userId: string }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
@@ -85,7 +111,7 @@ export default function QuickAdd({ userId }: { userId: string }) {
                   Quick Capture
                 </h2>
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={handleClose}
                   className="text-zinc-500 hover:text-zinc-300"
                 >
                   <X className="h-5 w-5" />
@@ -129,6 +155,9 @@ export default function QuickAdd({ userId }: { userId: string }) {
                       e.preventDefault();
                       handleSubmit();
                     }
+                    if (e.key === "Escape") {
+                      handleClose();
+                    }
                   }}
                 />
                 <Textarea
@@ -136,6 +165,11 @@ export default function QuickAdd({ userId }: { userId: string }) {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Add details (optional)..."
                   className="bg-white/5 border-white/10 text-zinc-100 placeholder:text-zinc-500 focus:border-cyan-500/50 min-h-20 resize-none"
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      handleClose();
+                    }
+                  }}
                 />
                 <div className="flex gap-2">
                   <Button
@@ -147,7 +181,7 @@ export default function QuickAdd({ userId }: { userId: string }) {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => setIsOpen(false)}
+                    onClick={handleClose}
                     className="border-white/10 text-zinc-400 hover:text-zinc-100"
                   >
                     Cancel
@@ -157,7 +191,7 @@ export default function QuickAdd({ userId }: { userId: string }) {
 
               {/* ADHD-friendly hint */}
               <p className="text-xs text-zinc-500 mt-3 text-center">
-                ⚡ Press <kbd className="px-1.5 py-0.5 rounded bg-white/5 text-zinc-400">Enter</kbd> to save instantly
+                ⚡ Press <kbd className="px-1.5 py-0.5 rounded bg-white/5 text-zinc-400">Enter</kbd> to save instantly · <kbd className="px-1.5 py-0.5 rounded bg-white/5 text-zinc-400">Esc</kbd> to close
               </p>
             </motion.div>
           </motion.div>
